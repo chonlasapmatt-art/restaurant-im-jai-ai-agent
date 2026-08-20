@@ -52,10 +52,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        64,
-        320
+        176,
+        128
       ],
-      "notes": "⚠️ ต้องแก้ 3 ค่านี้ก่อนใช้งานจริง: DISCORD_WEBHOOK_URL (สร้างใหม่ เพราะตัวเดิมหลุดมาในไฟล์ที่ส่งให้) · PUBLIC_BASE_URL (URL n8n ของคุณ) · APPROVAL_SECRET (ตั้งรหัสสุ่มของตัวเอง) · QR_IMAGE_URL เว้นว่างไว้ก่อนได้ ใส่ทีหลังตอนมี QR"
+      "notes": "⚠️ ต้องแก้ 3 ค่านี้ก่อนใช้งานจริง: DISCORD_WEBHOOK_URL (สร้างใหม่ เพราะตัวเดิมหลุดมาในไฟล์ที่ส่งให้) · PUBLIC_BASE_URL (URL n8n ของคุณ) · APPROVAL_SECRET (ตั้งรหัสสุ่มของตัวเอง — ต้องตั้งให้ตรงกับ ค่า SECRET ใน node 'Build Confirm Page HTML' ด้วย เพราะ node นั้นรันคนละ execution อ้างอิง Config นี้ไม่ถึง) · QR_IMAGE_URL เว้นว่างไว้ก่อนได้ ใส่ทีหลังตอนมี QR | node นี้ต่ออยู่หลัง LINE Webhook โดยตรงเพื่อให้รันทุกครั้งก่อน node อื่นจะอ้างอิง $('⚙️ Config') ได้"
     },
     {
       "parameters": {
@@ -83,7 +83,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        288,
+        352,
         128
       ]
     },
@@ -103,7 +103,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        560,
+        640,
         128
       ],
       "notes": "สมองหลักของระบบ v2: รับออเดอร์ในแชทได้ + แนะนำสินค้า + human-in-loop เดิม returnIntermediateSteps เปิดไว้เพื่อให้ node ถัดไปตรวจได้จริงว่ามีการสร้างออเดอร์สำเร็จหรือไม่ (ไม่พึ่งพาแค่คำพูดของ AI)"
@@ -491,7 +491,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        928,
+        992,
         128
       ],
       "notes": "แก้บั๊ก \\\\n ที่ทำให้ลูกค้าเห็นตัวอักษร \\\\n โผล่ในแชทจริง (ตามที่แจ้งมา) และเพิ่มการตรวจจาก intermediateSteps ว่ามีการสร้างออเดอร์จริงไหม แทนที่จะเชื่อคำพูดของ AI เฉย ๆ"
@@ -536,7 +536,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1152,
+        1216,
         128
       ],
       "credentials": {
@@ -578,7 +578,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1376,
+        1440,
         128
       ]
     },
@@ -987,7 +987,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ── สร้างหน้ายืนยันการชำระเงิน (มือถือกดง่าย) ──────────────────────────────\n// crawler ที่ prefetch ลิงก์จะได้แค่ HTML นี้ ไม่มีทางสั่งยืนยันได้\n// เพราะการยืนยันจริงต้องกดปุ่ม -> ยิง POST เข้า resume URL เท่านั้น\nconst crypto = require('crypto');\nconst cfg = $('⚙️ Config').first().json;\nconst SECRET = cfg.APPROVAL_SECRET || 'CHANGE_ME_ANY_RANDOM_STRING';\n\nconst q = $('Payment Confirm Page (GET)').first().json.query || {};\nconst order_id = (q.order_id || '').toString();\nconst token = (q.token || '').toString();\nconst resume = (q.resume || '').toString();\n\nconst expected = crypto.createHash('sha256').update(order_id + '|' + SECRET).digest('hex').slice(0, 24);\nconst valid = order_id && resume && token === expected;\n\nconst order = $input.first().json || {};\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n\nconst shell = (inner, bg) => `<!doctype html><html lang=\"th\"><head>\n<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<meta name=\"robots\" content=\"noindex,nofollow\"><title>ยืนยันการชำระเงิน — อิ่มใจ</title>\n<style>\n*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Noto Sans Thai\",sans-serif;\nbackground:${bg};min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1f2933}\n.card{background:#fff;border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.18);max-width:460px;width:100%;padding:28px}\nh1{font-size:20px;margin:0 0 6px}.sub{color:#61707d;font-size:14px;margin:0 0 20px}\n.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eef1f4;font-size:14px}\n.row b{color:#61707d;font-weight:500}\nbutton{width:100%;border:0;border-radius:14px;padding:18px;font-size:17px;font-weight:700;color:#fff;cursor:pointer;margin-top:18px}\n.ok{background:#16a34a}\ninput{width:100%;padding:12px;border:1px solid #d5dde3;border-radius:12px;margin-top:14px;font-size:15px}\n.note{font-size:12px;color:#8a97a3;margin-top:14px;line-height:1.6}\n.done{text-align:center}.done .em{font-size:52px}\n</style></head><body><div class=\"card\">${inner}</div></body></html>`;\n\nif (!valid) {\n  const html = shell(`<div class=\"done\"><div class=\"em\">🚫</div>\n    <h1>ลิงก์ไม่ถูกต้องหรือหมดอายุ</h1>\n    <p class=\"sub\">ไม่สามารถยืนยันตัวตนของลิงก์นี้ได้ กรุณาเปิดลิงก์จากข้อความแจ้งเตือนใน Discord อีกครั้ง\n    หรือติดต่อผู้ดูแลระบบ</p></div>`, '#f1f5f9');\n  return [{ json: { html, valid: false } }];\n}\n\nconst html = shell(`\n  <h1>✅ ยืนยันการชำระเงิน</h1>\n  <p class=\"sub\">เช็คสลิป/เงินเข้าบัญชีแล้วเท่านั้นถึงกดปุ่มนี้ ระบบจะขึ้นว่า 'ชำระแล้ว' ให้ลูกค้าทันทีหลังกด</p>\n  <div class=\"row\"><b>เลขที่ออเดอร์</b><span>${esc(order_id)}</span></div>\n  <div class=\"row\"><b>ลูกค้า</b><span>${esc(order.customer_name)} (${esc(order.customer_phone)})</span></div>\n  <div class=\"row\"><b>รายการ</b><span>${esc(order.items)}</span></div>\n  <div class=\"row\"><b>ยอดชำระ</b><span>${esc(order.total_amount)} บาท</span></div>\n  <div class=\"row\"><b>ช่องทางรับของ</b><span>${esc(order.order_type)}</span></div>\n  <input id=\"approver\" placeholder=\"ชื่อผู้ยืนยัน (เช่น พนักงานเก็บเงิน)\" />\n  <button class=\"ok\" id=\"go\">ยืนยันว่าชำระเงินแล้ว</button>\n  <p class=\"note\">🔒 การเปิดหน้านี้ (รวมถึงการ preview ลิงก์อัตโนมัติของ Discord) จะไม่ทำให้เกิดการยืนยันเอง\n  ต้องมีคนกดปุ่มนี้เท่านั้น ข้อมูลด้านบนดึงจากชีตล่าสุด ณ ตอนเปิดหน้านี้</p>\n  <script>\n  document.getElementById('go').addEventListener('click', async function () {\n    var btn = this; btn.disabled = true; btn.textContent = 'กำลังส่ง...';\n    try {\n      var res = await fetch(${JSON.stringify(resume)}, {\n        method: 'POST', headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify({ decision: 'confirm', order_id: ${JSON.stringify(order_id)},\n          approver: document.getElementById('approver').value || 'ทีมงาน' })\n      });\n      btn.textContent = res.ok ? '✅ ยืนยันเรียบร้อย ปิดหน้านี้ได้เลย' : 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';\n      if (!res.ok) btn.disabled = false;\n    } catch (e) { btn.textContent = 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'; btn.disabled = false; }\n  });\n  </script>\n`, '#eef2ff');\n\nreturn [{ json: { html, valid: true } }];"
+        "jsCode": "// ── สร้างหน้ายืนยันการชำระเงิน (มือถือกดง่าย) ──────────────────────────────\n// crawler ที่ prefetch ลิงก์จะได้แค่ HTML นี้ ไม่มีทางสั่งยืนยันได้\n// เพราะการยืนยันจริงต้องกดปุ่ม -> ยิง POST เข้า resume URL เท่านั้น\nconst crypto = require('crypto');\n// ⚠️ node นี้ถูกเรียกจาก webhook คนละตัว (Payment Confirm Page GET) จึงเป็นคนละ execution\n// จาก LINE Webhook อ้างอิง node ⚙️ Config ข้าม execution ไม่ได้ ต้องตั้งค่าซ้ำตรงนี้ให้ตรงกับ\n// APPROVAL_SECRET ใน ⚙️ Config เป๊ะ ๆ (แก้ที่นี่ด้วยทุกครั้งที่เปลี่ยนค่าใน Config)\nlet SECRET = 'CHANGE_ME_ANY_RANDOM_STRING';\ntry { if ($env && $env.IMJAI_APPROVAL_SECRET) SECRET = $env.IMJAI_APPROVAL_SECRET; } catch (e) {}\n\nconst q = $('Payment Confirm Page (GET)').first().json.query || {};\nconst order_id = (q.order_id || '').toString();\nconst token = (q.token || '').toString();\nconst resume = (q.resume || '').toString();\n\nconst expected = crypto.createHash('sha256').update(order_id + '|' + SECRET).digest('hex').slice(0, 24);\nconst valid = order_id && resume && token === expected;\n\nconst order = $input.first().json || {};\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n\nconst shell = (inner, bg) => `<!doctype html><html lang=\"th\"><head>\n<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<meta name=\"robots\" content=\"noindex,nofollow\"><title>ยืนยันการชำระเงิน — อิ่มใจ</title>\n<style>\n*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Noto Sans Thai\",sans-serif;\nbackground:${bg};min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1f2933}\n.card{background:#fff;border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.18);max-width:460px;width:100%;padding:28px}\nh1{font-size:20px;margin:0 0 6px}.sub{color:#61707d;font-size:14px;margin:0 0 20px}\n.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eef1f4;font-size:14px}\n.row b{color:#61707d;font-weight:500}\nbutton{width:100%;border:0;border-radius:14px;padding:18px;font-size:17px;font-weight:700;color:#fff;cursor:pointer;margin-top:18px}\n.ok{background:#16a34a}\ninput{width:100%;padding:12px;border:1px solid #d5dde3;border-radius:12px;margin-top:14px;font-size:15px}\n.note{font-size:12px;color:#8a97a3;margin-top:14px;line-height:1.6}\n.done{text-align:center}.done .em{font-size:52px}\n</style></head><body><div class=\"card\">${inner}</div></body></html>`;\n\nif (!valid) {\n  const html = shell(`<div class=\"done\"><div class=\"em\">🚫</div>\n    <h1>ลิงก์ไม่ถูกต้องหรือหมดอายุ</h1>\n    <p class=\"sub\">ไม่สามารถยืนยันตัวตนของลิงก์นี้ได้ กรุณาเปิดลิงก์จากข้อความแจ้งเตือนใน Discord อีกครั้ง\n    หรือติดต่อผู้ดูแลระบบ</p></div>`, '#f1f5f9');\n  return [{ json: { html, valid: false } }];\n}\n\nconst html = shell(`\n  <h1>✅ ยืนยันการชำระเงิน</h1>\n  <p class=\"sub\">เช็คสลิป/เงินเข้าบัญชีแล้วเท่านั้นถึงกดปุ่มนี้ ระบบจะขึ้นว่า 'ชำระแล้ว' ให้ลูกค้าทันทีหลังกด</p>\n  <div class=\"row\"><b>เลขที่ออเดอร์</b><span>${esc(order_id)}</span></div>\n  <div class=\"row\"><b>ลูกค้า</b><span>${esc(order.customer_name)} (${esc(order.customer_phone)})</span></div>\n  <div class=\"row\"><b>รายการ</b><span>${esc(order.items)}</span></div>\n  <div class=\"row\"><b>ยอดชำระ</b><span>${esc(order.total_amount)} บาท</span></div>\n  <div class=\"row\"><b>ช่องทางรับของ</b><span>${esc(order.order_type)}</span></div>\n  <input id=\"approver\" placeholder=\"ชื่อผู้ยืนยัน (เช่น พนักงานเก็บเงิน)\" />\n  <button class=\"ok\" id=\"go\">ยืนยันว่าชำระเงินแล้ว</button>\n  <p class=\"note\">🔒 การเปิดหน้านี้ (รวมถึงการ preview ลิงก์อัตโนมัติของ Discord) จะไม่ทำให้เกิดการยืนยันเอง\n  ต้องมีคนกดปุ่มนี้เท่านั้น ข้อมูลด้านบนดึงจากชีตล่าสุด ณ ตอนเปิดหน้านี้</p>\n  <script>\n  document.getElementById('go').addEventListener('click', async function () {\n    var btn = this; btn.disabled = true; btn.textContent = 'กำลังส่ง...';\n    try {\n      var res = await fetch(${JSON.stringify(resume)}, {\n        method: 'POST', headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify({ decision: 'confirm', order_id: ${JSON.stringify(order_id)},\n          approver: document.getElementById('approver').value || 'ทีมงาน' })\n      });\n      btn.textContent = res.ok ? '✅ ยืนยันเรียบร้อย ปิดหน้านี้ได้เลย' : 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';\n      if (!res.ok) btn.disabled = false;\n    } catch (e) { btn.textContent = 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'; btn.disabled = false; }\n  });\n  </script>\n`, '#eef2ff');\n\nreturn [{ json: { html, valid: true } }];"
       },
       "id": "dbf4273c-7447-4937-b378-3581461b1f6f",
       "name": "Build Confirm Page HTML",
@@ -997,7 +997,7 @@
         1600,
         720
       ],
-      "notes": "reuse ลาย/กลไก anti-prefetch เดียวกับ workflow/imjai-line-ai-agent-full.json (Build Approval Confirm Page) ที่พิสูจน์แล้วด้วย tests/guard-approval.js"
+      "notes": "⚠️ SECRET ในนี้ต้องตั้งให้ตรงกับ APPROVAL_SECRET ใน node ⚙️ Config เป๊ะ ๆ (คนละ execution กัน อ้างอิงข้ามกันไม่ได้) ถ้า self-host ได้ตั้ง env var IMJAI_APPROVAL_SECRET ให้ทั้งสองจุดจะได้ค่าเดียวกันอัตโนมัติ"
     },
     {
       "parameters": {
@@ -1075,7 +1075,7 @@
       "main": [
         [
           {
-            "node": "Parse LINE Event",
+            "node": "⚙️ Config",
             "type": "main",
             "index": 0
           }
@@ -1414,6 +1414,17 @@
         [
           {
             "node": "Discord — แจ้งระบบพัง",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Parse LINE Event",
             "type": "main",
             "index": 0
           }
