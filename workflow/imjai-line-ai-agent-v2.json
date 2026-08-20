@@ -1022,6 +1022,51 @@
         1824,
         720
       ]
+    },
+    {
+      "parameters": {},
+      "id": "a2c390b8-6c9a-4225-b60a-f53375d9d583",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        960
+      ],
+      "notes": "n8n เรียก node นี้อัตโนมัติเมื่อ execution ของ workflow นี้ล่ม (ต้องไปตั้ง ⋯ → Settings → Error Workflow → เลือก workflow นี้เองด้วย ไม่งั้นจะไม่ทำงาน)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── ระบบมีปัญหา → แจ้งแอดมินทาง Discord ทันที ─────────────────────────────\n// หมายเหตุ: Error Workflow รันเป็นคนละ execution จากตัวที่พัง จึงอ้างอิง node ⚙️ Config เดิมไม่ได้\n// ต้องใส่ Discord Webhook URL ซ้ำอีกทีตรงนี้ (ใช้ตัวเดียวกับใน ⚙️ Config)\nconst WEBHOOK = 'PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE';\n\nconst j = $input.first().json || {};\nconst err = j.execution || {};\nconst wf = j.workflow || {};\nconst stamp = new Date(Date.now() + 7 * 3600 * 1000).toISOString().replace('T', ' ').slice(0, 19);\n\nconst payload = {\n  username: 'อิ่มใจ System',\n  content: '@here ⚠️ **ระบบ AI ลูกค้าสัมพันธ์มีปัญหา — รบกวนแอดมินเข้าดูแลลูกค้าแทนชั่วคราว**',\n  embeds: [{\n    title: '⚠️ Workflow error: ' + (wf.name || 'ImJai LINE AI Agent v2'),\n    color: 10038562,\n    fields: [\n      { name: 'Node ที่พัง', value: '`' + ((err.lastNodeExecuted) || '-') + '`', inline: false },\n      { name: 'ข้อความ error', value: '```' + String((err.error && err.error.message) || '-').slice(0, 900) + '```', inline: false },\n      { name: 'เวลา', value: stamp, inline: true },\n      { name: 'Execution', value: String(err.id || '-'), inline: true },\n    ],\n    footer: { text: 'ลูกค้าอาจไม่ได้รับคำตอบจากบอท กรุณาเช็ค LINE OA Manager' },\n  }],\n};\n\nreturn [{ json: { discord_webhook_url: WEBHOOK, discord_payload: payload } }];"
+      },
+      "id": "937baf3c-3626-4b49-b6f7-a97e79ea9d26",
+      "name": "Build System Error Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        960
+      ],
+      "notes": "⚠️ ต้องแก้ WEBHOOK ในโค้ดนี้เองด้วย (แก้แค่ใน ⚙️ Config ไม่พอ เพราะ node นี้รันคนละ execution)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.discord_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.discord_payload) }}",
+        "options": {}
+      },
+      "id": "89626b82-d112-4ec4-b010-4e6d10d30859",
+      "name": "Discord — แจ้งระบบพัง",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        960
+      ],
+      "onError": "continueRegularOutput"
     }
   ],
   "pinData": {},
@@ -1348,6 +1393,28 @@
           {
             "node": "AI Agent — น้องอิ่มใจ",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build System Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build System Error Alert": {
+      "main": [
+        [
+          {
+            "node": "Discord — แจ้งระบบพัง",
+            "type": "main",
             "index": 0
           }
         ]

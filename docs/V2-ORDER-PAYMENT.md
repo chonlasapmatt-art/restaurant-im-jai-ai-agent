@@ -78,6 +78,17 @@
 `Google Sheets`, `LINE`, `Google Gemini` credential ใช้ตัวเดิมที่ผูกไว้อยู่แล้ว ไม่ต้องสร้างใหม่
 (เว้นแต่จะไป revoke LINE token ตามคำแนะนำด้านบน ก็แค่แก้ค่าใน credential เดิม ไม่ต้องสร้าง credential ใหม่)
 
+### ตั้งแจ้งเตือนเมื่อระบบล่ม (Error Workflow)
+
+ไฟล์นี้มี node `Error Trigger` → `Build System Error Alert` → `Discord — แจ้งระบบพัง` ให้แล้ว
+แต่ n8n ต้องตั้งค่าเพิ่ม 2 จุดถึงจะทำงาน:
+
+1. เปิด node **`Build System Error Alert`** → แก้บรรทัด `WEBHOOK = 'PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE'` เป็น URL จริง
+   (ต้องแก้ตรงนี้ **แยกจาก** `⚙️ Config` เพราะ error workflow รันคนละ execution จากตัวที่ล่ม เลยอ้างอิง node อื่นข้ามไม่ได้)
+2. หน้า workflow → **⋯ → Settings → Error Workflow → เลือก workflow นี้เอง**
+
+ตั้งแล้วถ้า node ไหนพังกลางทาง Discord จะเด้งบอกทันทีว่าพังตรงไหน แทนที่ลูกค้าจะเงียบไปเฉย ๆ โดยไม่มีใครรู้
+
 ---
 
 ## ทำไมไม่ให้ AI ยืนยันการชำระเงินเอง
@@ -108,6 +119,9 @@
 node tests/guard-payment.js     # พิสูจน์ว่า AI สั่ง "ชำระเงินแล้ว" เองไม่ได้
 node tests/guard-approval.js    # (จากเวอร์ชัน full) พิสูจน์เรื่องคืนเงิน/ยกเลิกยังต้องรออนุมัติ
 ```
+
+📋 เช็กลิสต์ทดสอบแบบละเอียดทีละสถานการณ์ (รับออเดอร์ / ยืนยันจ่ายเงิน / ส่งต่อแอดมิน / ความเสถียร)
+ดูที่ [`docs/UAT-CHECKLIST-v2.md`](UAT-CHECKLIST-v2.md)
 
 ทดสอบผ่าน LINE จริงหลัง import:
 
