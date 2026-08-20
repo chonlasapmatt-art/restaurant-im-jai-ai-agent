@@ -676,7 +676,7 @@
     },
     {
       "parameters": {
-        "operation": "get",
+        "operation": "read",
         "documentId": {
           "__rl": true,
           "value": "1eWa3gM4GRjjr70igor77U9o-x1ARZE3i9-BxOrbtBkM",
@@ -943,7 +943,7 @@
     },
     {
       "parameters": {
-        "operation": "get",
+        "operation": "read",
         "documentId": {
           "__rl": true,
           "value": "1eWa3gM4GRjjr70igor77U9o-x1ARZE3i9-BxOrbtBkM",
