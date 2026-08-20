@@ -1,0 +1,738 @@
+<title>ติดตั้งน้องอิ่มใจ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#FAFBF9;
+  --surface:#FFFFFF;
+  --sunk:#F1F4F1;
+  --ink:#161A17;
+  --muted:#5D6B62;
+  --faint:#8A968F;
+  --rule:#E1E7E2;
+  --rule-strong:#C9D2CC;
+  --jade:#0B7A4B;
+  --jade-soft:#E7F3ED;
+  --amber:#9C5A08;
+  --amber-soft:#FBF1E2;
+  --clay:#AF3626;
+  --clay-soft:#FBEDEB;
+  --shadow:0 1px 2px rgba(22,26,23,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1210;
+    --surface:#161B18;
+    --sunk:#1D2320;
+    --ink:#E8EEEA;
+    --muted:#9AA8A0;
+    --faint:#748078;
+    --rule:#252D28;
+    --rule-strong:#38423C;
+    --jade:#4ECB8D;
+    --jade-soft:#12241C;
+    --amber:#D8A05B;
+    --amber-soft:#241C10;
+    --clay:#E58573;
+    --clay-soft:#241512;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1210;
+  --surface:#161B18;
+  --sunk:#1D2320;
+  --ink:#E8EEEA;
+  --muted:#9AA8A0;
+  --faint:#748078;
+  --rule:#252D28;
+  --rule-strong:#38423C;
+  --jade:#4ECB8D;
+  --jade-soft:#12241C;
+  --amber:#D8A05B;
+  --amber-soft:#241C10;
+  --clay:#E58573;
+  --clay-soft:#241512;
+  --shadow:none;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans Thai","IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 96px}
+
+/* ── sticky bar ─────────────────────────────── */
+.bar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--paper) 92%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.bar-in{
+  max-width:1000px;margin:0 auto;padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.bar-name{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:700;font-size:15px;letter-spacing:.01em;
+}
+.bar-name span{color:var(--jade)}
+.prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.prog-track{width:110px;height:5px;background:var(--sunk);border:1px solid var(--rule);position:relative;overflow:hidden}
+.prog-fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--jade);transition:width .28s ease}
+.prog b{font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ── hero ───────────────────────────────────── */
+header.hero{padding:60px 0 40px;border-bottom:2px solid var(--ink)}
+.kicker{
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--jade);margin:0 0 18px;
+}
+h1{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:700;
+  font-size:clamp(34px,6vw,54px);line-height:1.15;margin:0 0 18px;
+  text-wrap:balance;letter-spacing:-.01em;
+}
+.sub{font-size:18px;color:var(--muted);max-width:62ch;margin:0 0 32px;line-height:1.7}
+.facts{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule);background:var(--surface)}
+.fact{flex:1 1 170px;padding:16px 20px;border-right:1px solid var(--rule)}
+.fact:last-child{border-right:0}
+.fact dt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+.fact dd{margin:0;font-weight:600;font-size:15px}
+
+/* ── prerequisites ──────────────────────────── */
+.pre{margin:48px 0 8px;border:1px solid var(--rule);background:var(--surface);box-shadow:var(--shadow)}
+.pre-hd{padding:20px 24px;border-bottom:1px solid var(--rule)}
+.pre-hd h2{margin:0 0 4px}
+.pre-hd p{margin:0;color:var(--muted);font-size:14.5px}
+.pre-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.pre-item{padding:18px 24px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.pre-item:last-child{border-right:0}
+.pre-item h3{margin:0 0 4px;font-size:14.5px;font-family:"IBM Plex Sans Thai",sans-serif;font-weight:600}
+.pre-item p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+
+/* ── steps ──────────────────────────────────── */
+h2{font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:22px;line-height:1.35;margin:0 0 10px;text-wrap:balance}
+.section-label{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin:56px 0 0;padding-bottom:10px;border-bottom:1px solid var(--rule);
+}
+.step{
+  display:grid;grid-template-columns:150px 1fr;gap:32px;
+  padding:36px 0;border-bottom:1px solid var(--rule);
+}
+.step.done .body{opacity:.5}
+.meta{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.num{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:700;font-size:38px;line-height:1;
+  color:var(--jade);font-variant-numeric:tabular-nums;
+}
+.step.done .num{color:var(--faint)}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid var(--rule-strong);padding:4px 9px;color:var(--muted);white-space:nowrap;
+}
+.dot{width:7px;height:7px;flex:none}
+.d-n8n{background:#E0426A}.d-line{background:#06C755}.d-goog{background:#1A73E8}
+.d-disc{background:#5865F2}.d-oai{background:#10A37F}
+.mins{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.tick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none;margin-top:2px}
+.tick input{width:16px;height:16px;accent-color:var(--jade);cursor:pointer;margin:0}
+
+.body>p{margin:0 0 14px;max-width:66ch}
+.body>p:last-child{margin-bottom:0}
+ol.do,ul.do{margin:0 0 16px;padding-left:22px;max-width:66ch}
+ol.do li,ul.do li{margin-bottom:9px}
+ol.do li::marker{color:var(--jade);font-weight:600}
+kbd{
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  background:var(--sunk);border:1px solid var(--rule-strong);padding:1px 6px;white-space:nowrap;
+}
+code{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);padding:1px 5px;border:1px solid var(--rule)}
+a{color:var(--jade);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+
+/* copyable */
+.copy{
+  display:flex;align-items:stretch;border:1px solid var(--rule-strong);background:var(--sunk);
+  margin:0 0 16px;max-width:66ch;
+}
+.copy code{
+  flex:1;background:none;border:0;padding:10px 12px;overflow-x:auto;white-space:nowrap;font-size:13px;
+}
+.copy button{
+  flex:none;border:0;border-left:1px solid var(--rule-strong);background:var(--surface);
+  color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;
+  padding:0 14px;cursor:pointer;text-transform:uppercase;
+}
+.copy button:hover{color:var(--jade)}
+.copy button.ok{color:var(--jade)}
+
+pre{
+  margin:0 0 16px;padding:16px;background:var(--sunk);border:1px solid var(--rule-strong);
+  overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.7;
+}
+pre .cm{color:var(--faint)}
+pre .kw{color:var(--jade)}
+pre .st{color:var(--amber)}
+
+table{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:14.5px}
+.tw{overflow-x:auto;margin-bottom:16px}
+.tw table{margin:0;min-width:440px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);font-weight:400;border-bottom:1px solid var(--rule-strong);
+}
+
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);padding:12px 16px;margin:0 0 16px;max-width:66ch;font-size:14.5px}
+.note strong{color:var(--amber)}
+.danger{border-left:3px solid var(--clay);background:var(--clay-soft);padding:12px 16px;margin:0 0 16px;max-width:66ch;font-size:14.5px}
+.danger strong{color:var(--clay)}
+
+.verify{border:1px solid var(--jade);background:var(--jade-soft);padding:14px 16px;margin:20px 0 0;max-width:66ch}
+.verify h3{
+  margin:0 0 6px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--jade);font-weight:500;
+}
+.verify p{margin:0;font-size:14.5px}
+.verify p+p{margin-top:6px}
+
+/* troubleshooting */
+.tsh{border-top:2px solid var(--ink);margin-top:56px;padding-top:36px}
+.fix{border:1px solid var(--rule);background:var(--surface);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.fix h3{margin:0 0 8px;font-size:15.5px;font-weight:600;font-family:"IBM Plex Sans Thai",sans-serif}
+.fix h3::before{content:"✕";color:var(--clay);font-family:"IBM Plex Mono",monospace;margin-right:9px;font-size:14px}
+.fix p{margin:0 0 8px;font-size:14.5px;color:var(--muted)}
+.fix p:last-child{margin-bottom:0}
+.fix p strong{color:var(--ink)}
+
+footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--rule);color:var(--faint);font-size:13.5px}
+
+@media(max-width:760px){
+  .wrap{padding:0 18px 72px}
+  .bar-in{padding:10px 18px}
+  .step{grid-template-columns:1fr;gap:16px;padding:30px 0}
+  .meta{flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px}
+  .num{font-size:28px}
+  .fact{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--rule)}
+  .fact:last-child{border-bottom:0}
+  .pre-item{border-right:0}
+}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="bar-name">ติดตั้ง<span>น้องอิ่มใจ</span></div>
+    <div class="prog">
+      <span>ทำแล้ว <b id="pn">0</b>/<b>9</b></span>
+      <div class="prog-track"><div class="prog-fill" id="pf"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="kicker">อิ่มใจ Cafe &amp; Kitchen · คู่มือติดตั้ง</p>
+  <h1>จากศูนย์ถึงบอทตอบลูกค้าใน LINE</h1>
+  <p class="sub">
+    ทำตาม 9 ขั้นตอนนี้ทีละข้อ ทุกข้อบอกว่าคุณต้องอยู่ที่เว็บไหน กดตรงไหน
+    และจะรู้ได้ยังไงว่าผ่านแล้ว ไม่ต้องเขียนโค้ดเองสักบรรทัด
+  </p>
+  <dl class="facts">
+    <div class="fact"><dt>เวลาที่ใช้</dt><dd>ประมาณ 1 ชั่วโมง</dd></div>
+    <div class="fact"><dt>ต้องเขียนโค้ด</dt><dd>ไม่ต้องเลย</dd></div>
+    <div class="fact"><dt>แก้ค่าใน n8n</dt><dd>node เดียว 4 บรรทัด</dd></div>
+    <div class="fact"><dt>ค่าใช้จ่ายต่อเดือน</dt><dd>ประมาณ 1,100 บาท</dd></div>
+  </dl>
+</header>
+
+<section class="pre">
+  <div class="pre-hd">
+    <h2>ก่อนเริ่ม เตรียม 4 บัญชีนี้ให้พร้อม</h2>
+    <p>ถ้ายังไม่มี ให้สมัครไปพร้อมกับทำขั้นตอนได้เลย ไม่ต้องสมัครครบก่อน</p>
+  </div>
+  <div class="pre-list">
+    <div class="pre-item">
+      <h3>n8n Cloud</h3>
+      <p>ที่รันระบบทั้งหมด ทดลองฟรี 14 วัน แล้วประมาณ 900 บาท/เดือน</p>
+    </div>
+    <div class="pre-item">
+      <h3>LINE Developers</h3>
+      <p>ใช้บัญชี LINE ปกติล็อกอินได้เลย ฟรี</p>
+    </div>
+    <div class="pre-item">
+      <h3>OpenAI</h3>
+      <p>สมองของบอท ต้องเติมเครดิตขั้นต่ำ 5 ดอลลาร์ (~180 บาท)</p>
+    </div>
+    <div class="pre-item">
+      <h3>Discord</h3>
+      <p>ที่แจ้งเตือนแอดมิน มี server ของตัวเองสัก 1 อัน ฟรี</p>
+    </div>
+  </div>
+</section>
+
+<p class="section-label">ขั้นตอนการติดตั้ง</p>
+
+<!-- 1 -->
+<section class="step" id="s1">
+  <div class="meta">
+    <div class="num">1</div>
+    <div class="chip"><span class="dot d-n8n"></span>n8n</div>
+    <div class="mins">10 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>เปิดบัญชี n8n Cloud</h2>
+    <p>
+      n8n คือตัวที่รันระบบทั้งหมด ต้องเป็น n8n ที่เข้าถึงได้จากอินเทอร์เน็ต
+      เพราะ LINE ต้องยิงข้อมูลเข้ามาหา ใช้ n8n Cloud จะได้ที่อยู่มาให้เลยไม่ต้องตั้งเซิร์ฟเวอร์เอง
+    </p>
+    <ol class="do">
+      <li>เข้า <a href="https://n8n.io" target="_blank" rel="noopener">n8n.io</a> กด <kbd>Get started</kbd> แล้วสมัครด้วยอีเมล</li>
+      <li>เลือกแพลนที่มีทดลองฟรี ระบบจะสร้างพื้นที่ให้อัตโนมัติ</li>
+      <li>จดที่อยู่ที่ได้มาไว้ หน้าตาประมาณ <code>https://ชื่อคุณ.app.n8n.cloud</code></li>
+    </ol>
+    <div class="note">
+      <strong>ทำไมแนะนำ Cloud</strong> — ตอนเชื่อม Google Sheets ในขั้นที่ 7 คุณจะกดปุ่ม
+      “Sign in with Google” ปุ่มเดียวจบ ถ้าติดตั้ง n8n เองต้องไปสร้าง OAuth ใน Google Cloud Console
+      ซึ่งเป็นขั้นตอนที่ยากที่สุดของทั้งงานนี้
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>เปิดที่อยู่ของคุณแล้วเห็นหน้า n8n ที่มีปุ่ม <kbd>Create Workflow</kbd> อยู่</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="step" id="s2">
+  <div class="meta">
+    <div class="num">2</div>
+    <div class="chip"><span class="dot d-goog"></span>Google Drive</div>
+    <div class="mins">5 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>สร้างฐานข้อมูลร้านใน Google Sheets</h2>
+    <p>
+      ไฟล์นี้คือสมองส่วนความจำของบอท เมนู ราคา ข้อมูลร้าน อยู่ในนี้ทั้งหมด
+      แก้ในชีตเมื่อไหร่ บอทรู้ทันทีในข้อความถัดไป ไม่ต้องแก้ n8n
+    </p>
+    <ol class="do">
+      <li>เปิด <a href="https://drive.google.com" target="_blank" rel="noopener">Google Drive</a> แล้ว<strong>ลากไฟล์ <code>ImJai_Database.xlsx</code> เข้าไปวาง</strong></li>
+      <li>คลิกขวาที่ไฟล์ที่อัปโหลดเสร็จ เลือก <kbd>Open with</kbd> → <kbd>Google Sheets</kbd></li>
+      <li>ในหน้าที่เปิดขึ้นมา กด <kbd>File</kbd> → <kbd>Save as Google Sheets</kbd></li>
+      <li>คัดลอกรหัสไฟล์จากแถบที่อยู่ ส่วนที่อยู่ระหว่าง <code>/d/</code> กับ <code>/edit</code></li>
+    </ol>
+    <div class="copy"><code>https://docs.google.com/spreadsheets/d/<b>1a2B3c4D...รหัสนี้</b>/edit</code><button type="button" disabled style="cursor:default">ตัวอย่าง</button></div>
+    <p>จะได้ชีตที่มีครบ 5 แท็บ แต่ละแท็บทำหน้าที่ต่างกัน</p>
+    <div class="tw">
+      <table>
+        <tr><th>แท็บ</th><th>ใครแก้</th><th>ทำอะไร</th></tr>
+        <tr><td><code>StoreProfile</code></td><td>คุณ</td><td>เวลาเปิด-ปิด ที่ตั้ง นโยบายร้าน</td></tr>
+        <tr><td><code>KnowledgeBase</code></td><td>คุณ</td><td>คำถามที่ลูกค้าถามบ่อย 15 ข้อ</td></tr>
+        <tr><td><code>Products</code></td><td>คุณ</td><td>เมนู ราคา ส่วนผสม ของหมด</td></tr>
+        <tr><td><code>Orders</code></td><td>เว็บสั่งอาหาร</td><td>ออเดอร์จริง บอทอ่านไปตอบว่าอาหารถึงไหนแล้ว</td></tr>
+        <tr><td><code>AIMemory</code></td><td>บอทเขียน คุณติ๊กยืนยัน</td><td>คลังคำตอบ ยิ่งใช้ยิ่งแม่น</td></tr>
+      </table>
+    </div>
+    <div class="danger">
+      <strong>ห้ามเปลี่ยนชื่อแท็บ</strong> — ระบบเรียกหาชื่อพวกนี้ตรงตัว ตัวพิมพ์ใหญ่พิมพ์เล็กก็มีผล
+      ถ้าเปลี่ยนแล้วบอทจะหาข้อมูลไม่เจอ
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>เปิดชีตแล้วเห็นแท็บครบ 5 อันด้านล่าง และแท็บ <code>Products</code> มีเมนู 17 รายการ</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="step" id="s3">
+  <div class="meta">
+    <div class="num">3</div>
+    <div class="chip"><span class="dot d-disc"></span>Discord</div>
+    <div class="mins">3 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>สร้างช่องแจ้งเตือนแอดมินใน Discord</h2>
+    <p>
+      ช่องนี้จะเงียบสนิทเวลาปกติ จะดังก็ต่อเมื่อมีเรื่องด่วน ลูกค้าขอคุยกับคน หรือระบบมีปัญหา
+      ไม่ต้องสร้างบอท ใช้แค่ที่อยู่สำหรับส่งข้อความอันเดียว
+    </p>
+    <ol class="do">
+      <li>ใน Discord server ของคุณ สร้าง channel ใหม่ ตั้งชื่อเช่น <code>imjai-alert</code></li>
+      <li>คลิกขวาที่ channel นั้น เลือก <kbd>Edit Channel</kbd></li>
+      <li>ไปที่ <kbd>Integrations</kbd> → <kbd>Webhooks</kbd> → <kbd>New Webhook</kbd></li>
+      <li>ตั้งชื่อว่า <code>อิ่มใจ Alert</code> แล้วกด <kbd>Copy Webhook URL</kbd> เก็บไว้</li>
+    </ol>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>ที่อยู่ที่คัดลอกมาต้องขึ้นต้นด้วย <code>https://discord.com/api/webhooks/</code></p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="step" id="s4">
+  <div class="meta">
+    <div class="num">4</div>
+    <div class="chip"><span class="dot d-line"></span>LINE Console</div>
+    <div class="mins">10 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>สร้าง LINE Official Account แล้วเอากุญแจ 2 ดอก</h2>
+    <ol class="do">
+      <li>เข้า <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers Console</a> ล็อกอินด้วยบัญชี LINE ของคุณ</li>
+      <li>สร้าง <kbd>Provider</kbd> ใหม่ (ใส่ชื่อร้านได้เลย) แล้วสร้าง channel แบบ <kbd>Messaging API</kbd></li>
+      <li>กรอกชื่อร้าน หมวดหมู่ธุรกิจ แล้วกดสร้าง</li>
+    </ol>
+    <p>จากนั้นเก็บค่า 2 อย่างนี้ไว้ อยู่คนละแท็บกัน</p>
+    <div class="tw">
+      <table>
+        <tr><th>ต้องได้</th><th>อยู่ที่แท็บ</th><th>วิธีเอา</th></tr>
+        <tr><td><strong>Channel secret</strong></td><td>Basic settings</td><td>เลื่อนลงไปหาแล้วคัดลอกได้เลย</td></tr>
+        <tr><td><strong>Channel access token</strong></td><td>Messaging API</td><td>เลื่อนลงล่างสุด กด <kbd>Issue</kbd> แล้วคัดลอก</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <strong>ปิดระบบตอบอัตโนมัติของ LINE ด้วย</strong> — ในแท็บ Messaging API หัวข้อ
+      <em>Auto-reply messages</em> ให้กด <kbd>Edit</kbd> แล้วปิด ไม่งั้นลูกค้าจะได้ข้อความตอบซ้อนกัน 2 อัน
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>คุณมีข้อความยาว ๆ 2 ชุดเก็บไว้ และ Auto-reply messages ขึ้นว่า Disabled</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="step" id="s5">
+  <div class="meta">
+    <div class="num">5</div>
+    <div class="chip"><span class="dot d-oai"></span>OpenAI</div>
+    <div class="mins">5 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>เอากุญแจ OpenAI แล้วเติมเครดิต</h2>
+    <ol class="do">
+      <li>เข้า <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> แล้วกด <kbd>Create new secret key</kbd></li>
+      <li>คัดลอกกุญแจที่ขึ้นต้นด้วย <code>sk-</code> เก็บไว้ทันที <strong>เพราะปิดหน้าไปแล้วจะดูซ้ำไม่ได้</strong></li>
+      <li>ไปที่ <kbd>Settings</kbd> → <kbd>Billing</kbd> แล้วเติมเงินขั้นต่ำ 5 ดอลลาร์</li>
+    </ol>
+    <div class="danger">
+      <strong>ต้องเติมเครดิตจริง</strong> — ถ้าไม่เติม บอทจะขึ้น error ทุกข้อความและลูกค้าจะไม่ได้รับคำตอบเลย
+      เครดิต 5 ดอลลาร์ตอบได้ประมาณ 1,500–3,000 ข้อความ
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>หน้า Billing ขึ้นยอดเครดิตคงเหลือมากกว่า 0 ดอลลาร์</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="step" id="s6">
+  <div class="meta">
+    <div class="num">6</div>
+    <div class="chip"><span class="dot d-n8n"></span>n8n</div>
+    <div class="mins">2 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>นำ workflow เข้า n8n</h2>
+    <ol class="do">
+      <li>ในหน้า n8n กดปุ่ม <kbd>⋯</kbd> มุมขวาบน เลือก <kbd>Import from File</kbd></li>
+      <li>เลือกไฟล์ <code>imjai-line-ai-agent-lite.json</code></li>
+      <li>จะเห็นแผนผัง 22 กล่องต่อกันเป็นสาย พร้อมป้ายกำกับสีเป็นกลุ่ม ๆ</li>
+    </ol>
+    <div class="note">
+      <strong>ถ้าขึ้นเตือนว่าหา credential ไม่เจอ ไม่ต้องตกใจ</strong> — เป็นเรื่องปกติ
+      เดี๋ยวไปผูกกันในขั้นที่ 8
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>เห็นกล่องแรกชื่อ <code>LINE Webhook</code> และกล่องสีเหลืองชื่อ <code>⚙️ ตั้งค่าระบบ</code> ต่อจากกัน</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="step" id="s7">
+  <div class="meta">
+    <div class="num">7</div>
+    <div class="chip"><span class="dot d-n8n"></span>n8n</div>
+    <div class="mins">5 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>ใส่ค่าที่เก็บมาทั้งหมด ใน node เดียว</h2>
+    <p>
+      ทั้งระบบมีจุดตั้งค่าจุดเดียว ดับเบิลคลิกที่กล่อง
+      <code>⚙️ ตั้งค่าระบบ (แก้ที่นี่ที่เดียว)</code> แล้วแก้ 4 บรรทัดบนสุด
+      ที่เหลือทั้ง workflow ดึงค่าจากที่นี่ให้เองหมด
+    </p>
+<pre><span class="cm">// ══════════════════════════════════════════════</span>
+<span class="cm">//  ⚙️  แก้ 4 บรรทัดนี้ที่เดียว แล้วทั้งระบบใช้ได้เลย</span>
+<span class="cm">// ══════════════════════════════════════════════</span>
+<span class="kw">const</span> SHEET_ID        = <span class="st">'รหัสชีตจากขั้นที่ 2'</span>;
+<span class="kw">const</span> DISCORD_WEBHOOK = <span class="st">'ที่อยู่ Discord จากขั้นที่ 3'</span>;
+<span class="kw">let</span>   SECRET          = <span class="st">'Channel secret จากขั้นที่ 4'</span>;
+<span class="kw">const</span> ORDER_WEB_URL   = <span class="st">''</span>;  <span class="cm">// เว้นว่างไว้ก่อน</span>
+</pre>
+    <p>
+      <code>ORDER_WEB_URL</code> คือเว็บสั่งอาหารที่ยังไม่ได้ทำ <strong>เว้นว่างไว้แบบนี้เลย</strong>
+      บอทจะแนะนำให้ลูกค้าโทรมาสั่งหรือสั่งผ่าน Grab แทน พอเว็บเสร็จค่อยมาใส่บรรทัดนี้บรรทัดเดียว
+    </p>
+    <p>แล้วแก้อีกกล่องเดียวคือ <code>สร้าง log ระบบพัง</code> ใส่ที่อยู่ Discord อันเดิมซ้ำอีกครั้ง</p>
+    <div class="note">
+      <strong>ทำไมต้องใส่ซ้ำ</strong> — กล่องนี้ทำงานตอนระบบพัง ซึ่งเป็นคนละรอบกับตอนคุยกับลูกค้า
+      เลยดึงค่าจากกล่อง ⚙️ ไม่ได้ ต้องมีสำเนาของตัวเอง
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>ในกล่อง ⚙️ ไม่เหลือคำว่า <code>PASTE_YOUR</code> อยู่เลยสักบรรทัด</p>
+      <p>กล่อง Google Sheets ทั้ง 6 อันไม่ต้องแตะเลย มันดึงรหัสชีตจากกล่อง ⚙️ ให้เอง</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="step" id="s8">
+  <div class="meta">
+    <div class="num">8</div>
+    <div class="chip"><span class="dot d-n8n"></span>n8n</div>
+    <div class="mins">10 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>ผูกกุญแจทั้ง 3 ชุดเข้ากับระบบ</h2>
+    <p>
+      ขั้นนี้คือการบอก n8n ว่ามีสิทธิ์เข้าถึงอะไรได้บ้าง ทำครั้งเดียวใช้ได้ทุกกล่อง
+      <strong>สำคัญมาก: ตั้งชื่อให้ตรงตามตารางเป๊ะ ๆ</strong> แล้ว n8n จะผูกให้ทุกกล่องอัตโนมัติ
+      ไม่ต้องไล่เลือกทีละอัน
+    </p>
+    <div class="tw">
+      <table>
+        <tr><th>เชื่อมกับ</th><th>ชนิด credential</th><th>ตั้งชื่อว่า</th></tr>
+        <tr><td>Google Sheets</td><td>Google Sheets OAuth2 API</td><td><code>Google Sheets account</code></td></tr>
+        <tr><td>OpenAI</td><td>OpenAI</td><td><code>OpenAi account</code></td></tr>
+        <tr><td>LINE</td><td>Header Auth</td><td><code>LINE Channel Access Token</code></td></tr>
+      </table>
+    </div>
+    <p><strong>Google Sheets</strong> — เปิดกล่อง <code>อ่านเมนู (Products)</code> ตรงช่อง Credential กด <kbd>Create new</kbd> แล้วกด Sign in with Google เลือกบัญชีที่เป็นเจ้าของชีต</p>
+    <p><strong>OpenAI</strong> — เปิดกล่อง <code>OpenAI Chat Model</code> แล้ววางกุญแจ <code>sk-</code> จากขั้นที่ 5</p>
+    <p><strong>LINE</strong> — เปิดกล่อง <code>ตอบลูกค้า (LINE)</code> สร้าง Header Auth ใหม่ กรอก 2 ช่องนี้</p>
+    <div class="copy"><code>Authorization</code><button type="button" class="cbtn">คัดลอก</button></div>
+    <div class="copy"><code>Bearer &lt;วาง Channel access token ตรงนี้&gt;</code><button type="button" class="cbtn">คัดลอก</button></div>
+    <div class="danger">
+      <strong>อย่าลืมคำว่า Bearer กับเว้นวรรค 1 ที</strong> — ถ้าวางแต่ token เฉย ๆ LINE จะปฏิเสธ
+      และบอทจะเงียบไม่ตอบอะไรเลย
+    </div>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>เปิดกล่อง <code>อ่านเมนู (Products)</code> แล้วกด <kbd>Execute step</kbd> ต้องเห็นเมนู 17 รายการโผล่มา</p>
+      <p>ถ้าเห็นเมนูแล้ว แปลว่าทั้ง n8n, Google Sheets และรหัสชีตของคุณต่อกันถูกหมดแล้ว</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="step" id="s9">
+  <div class="meta">
+    <div class="num">9</div>
+    <div class="chip"><span class="dot d-n8n"></span>n8n</div>
+    <div class="chip"><span class="dot d-line"></span>LINE</div>
+    <div class="mins">5 นาที</div>
+    <label class="tick"><input type="checkbox" data-step> ทำแล้ว</label>
+  </div>
+  <div class="body">
+    <h2>เปิดสวิตช์ แล้วต่อสาย LINE เข้าหา n8n</h2>
+    <ol class="do">
+      <li>กด <kbd>Save</kbd> แล้วสับสวิตช์ <kbd>Inactive</kbd> มุมขวาบนให้เป็น <kbd>Active</kbd></li>
+      <li>ดับเบิลคลิกกล่อง <code>LINE Webhook</code> คัดลอก <strong>Production URL</strong> จะได้แบบนี้</li>
+    </ol>
+    <div class="copy"><code>https://ชื่อคุณ.app.n8n.cloud/webhook/imjai-line</code><button type="button" class="cbtn">คัดลอก</button></div>
+    <ol class="do" start="3">
+      <li>กลับไป LINE Console แท็บ <kbd>Messaging API</kbd> หัวข้อ <em>Webhook settings</em></li>
+      <li>วางที่อยู่ลงช่อง <strong>Webhook URL</strong> แล้วกด <kbd>Update</kbd></li>
+      <li>กด <kbd>Verify</kbd> ต้องขึ้น <strong>Success</strong></li>
+      <li>เปิดสวิตช์ <strong>Use webhook</strong> ให้เป็นสีเขียว</li>
+    </ol>
+    <p>สุดท้าย ตั้งให้ระบบแจ้งคุณเวลามันพัง กลับมาที่ n8n กด <kbd>⋯</kbd> → <kbd>Settings</kbd> → <kbd>Error Workflow</kbd> แล้วเลือก workflow อันนี้เอง</p>
+    <div class="verify">
+      <h3>ผ่านหรือยัง</h3>
+      <p>กด Verify แล้วขึ้น Success สีเขียว และสวิตช์ใน n8n เป็น Active</p>
+    </div>
+  </div>
+</section>
+
+<p class="section-label">ทดสอบว่าใช้ได้จริง</p>
+
+<section class="step">
+  <div class="meta">
+    <div class="num">✓</div>
+    <div class="chip"><span class="dot d-line"></span>LINE บนมือถือ</div>
+    <div class="mins">10 นาที</div>
+  </div>
+  <div class="body">
+    <h2>พิมพ์ 5 ข้อความนี้ทีละอัน</h2>
+    <p>
+      ไปที่ LINE Console แท็บ <kbd>Messaging API</kbd> จะมี QR code ให้แอดเป็นเพื่อน
+      สแกนแล้วพิมพ์ตามนี้ทีละบรรทัด รอคำตอบก่อนพิมพ์อันถัดไป
+    </p>
+    <div class="tw">
+      <table>
+        <tr><th>พิมพ์ว่า</th><th>ต้องได้ผลแบบนี้</th><th>แปลว่าอะไรทำงาน</th></tr>
+        <tr><td>ร้านเปิดกี่โมง</td><td>ตอบ 07:00–20:00 น. ครัวปิดรับ 19:30</td><td>อ่านชีตได้</td></tr>
+        <tr><td>ลาเต้ราคาเท่าไหร่</td><td>ตอบ 70 บาท</td><td>อ่านเมนูได้</td></tr>
+        <tr><td>ต้มยำกุ้งมีไหม</td><td>บอกว่าหมดวันนี้ แล้วเสนอเมนูอื่น</td><td>อ่านสถานะของหมดถูก</td></tr>
+        <tr><td>ขอสั่งลาเต้เย็น 1 แก้ว</td><td>บอกราคา แล้วแนะนำให้โทรหรือสั่ง Grab</td><td>ไม่รับออเดอร์เอง ถูกต้อง</td></tr>
+        <tr><td>ขอคุยกับแอดมิน</td><td>Discord เด้งพร้อมชื่อคุณและคำถาม</td><td>ระบบแจ้งเตือนทำงาน</td></tr>
+      </table>
+    </div>
+    <div class="verify">
+      <h3>ผ่านครบ 5 ข้อแล้ว</h3>
+      <p>ระบบพร้อมใช้งานจริงแล้วครับ เปิดชีตแท็บ <code>AIMemory</code> จะเห็นบทสนทนาที่เพิ่งคุยถูกบันทึกไว้</p>
+    </div>
+  </div>
+</section>
+
+<section class="tsh">
+  <h2>เจอปัญหา แก้ตรงนี้</h2>
+  <p style="color:var(--muted);margin:0 0 22px;max-width:66ch">อาการที่เจอกันบ่อยที่สุด เรียงจากที่เจอบ่อยลงไปหาน้อย</p>
+
+  <div class="fix">
+    <h3>กด Verify ใน LINE แล้วขึ้น error</h3>
+    <p>เช็คก่อนว่าสวิตช์ใน n8n เป็น <strong>Active</strong> แล้วจริง ๆ ถ้ายังเป็น Inactive ที่อยู่นั้นจะยังใช้ไม่ได้</p>
+    <p>เช็คว่าที่อยู่ที่วางเป็น <strong>Production URL</strong> ไม่ใช่ Test URL ตัวที่ถูกต้องจะมีคำว่า <code>/webhook/</code> ไม่ใช่ <code>/webhook-test/</code></p>
+  </div>
+
+  <div class="fix">
+    <h3>ทักไปแล้วบอทเงียบ ไม่ตอบอะไรเลย</h3>
+    <p>ไปที่ n8n เมนู <kbd>Executions</kbd> ดูว่ามีรายการวิ่งเข้ามาไหม</p>
+    <p><strong>ถ้าไม่มีรายการเลย</strong> แปลว่า LINE ยิงไม่ถึง กลับไปเช็คสวิตช์ Use webhook ใน LINE Console ว่าเปิดอยู่</p>
+    <p><strong>ถ้ามีรายการแต่เป็นสีแดง</strong> ให้กดเข้าไปดูว่าพังที่กล่องไหน แล้วเทียบกับหัวข้ออื่นในหน้านี้</p>
+  </div>
+
+  <div class="fix">
+    <h3>กล่องสีแดงชื่อ ตอบลูกค้า (LINE) ขึ้น 401</h3>
+    <p>Header Auth ผิด เปิดไปดูว่าช่อง Value ขึ้นต้นด้วยคำว่า <strong>Bearer</strong> แล้วเว้นวรรค 1 ทีก่อน token หรือเปล่า</p>
+    <p>อีกกรณีคือ token หมดอายุ กลับไปกด <kbd>Issue</kbd> ใหม่ใน LINE Console</p>
+  </div>
+
+  <div class="fix">
+    <h3>กล่อง OpenAI Chat Model ขึ้น 429 หรือ insufficient_quota</h3>
+    <p>เครดิต OpenAI หมด หรือยังไม่ได้เติมตั้งแต่แรก ไปเติมที่ <kbd>Settings</kbd> → <kbd>Billing</kbd></p>
+  </div>
+
+  <div class="fix">
+    <h3>กล่อง Google Sheets ขึ้นว่าหาแท็บไม่เจอ</h3>
+    <p>ชื่อแท็บในชีตต้องตรงเป๊ะ ตัวพิมพ์ใหญ่พิมพ์เล็กมีผล เช็คว่าเป็น <code>Products</code> ไม่ใช่ <code>products</code></p>
+    <p>ถ้าชื่อถูกแล้วยังไม่ได้ ให้เปิดกล่องนั้น ตรงช่อง Sheet เปลี่ยนเป็น <kbd>From list</kbd> แล้วเลือกแท็บจากรายการแทน</p>
+  </div>
+
+  <div class="fix">
+    <h3>บอทตอบราคาผิด หรือบอกว่ามีเมนูที่หมดไปแล้ว</h3>
+    <p>เปิดชีตแท็บ <code>Products</code> ดูคอลัมน์ <code>is_available</code> ของหมดต้องเป็น <code>FALSE</code> ตัวใหญ่ทั้งหมด</p>
+    <p>ถ้าถูกแล้วแต่ยังตอบผิด ให้ไปเพิ่มคำตอบที่ถูกลงแท็บ <code>AIMemory</code> แล้วติ๊ก <code>verified</code> เป็น <code>TRUE</code> ครั้งหน้าบอทจะตอบตามนั้น</p>
+  </div>
+
+  <div class="fix">
+    <h3>ลูกค้าได้ข้อความตอบซ้อนกัน 2 อัน</h3>
+    <p>ระบบตอบอัตโนมัติของ LINE ยังเปิดอยู่ ไปปิดที่ LINE Console แท็บ Messaging API หัวข้อ <em>Auto-reply messages</em></p>
+  </div>
+</section>
+
+<section class="tsh">
+  <h2>พอเว็บสั่งอาหารเสร็จ ทำอีก 2 อย่าง</h2>
+  <p style="max-width:66ch">
+    ระบบเตรียมทางไว้ให้แล้ว ไม่ต้องรื้อ workflow ใหม่
+  </p>
+  <ol class="do">
+    <li>
+      ให้เว็บ<strong>เขียนออเดอร์ลงแท็บ <code>Orders</code></strong> ตามคอลัมน์เดิม
+      บอทจะตอบเรื่องสถานะออเดอร์ทาง LINE ได้ทันที
+    </li>
+    <li>
+      เอาที่อยู่เว็บมาใส่บรรทัด <code>ORDER_WEB_URL</code> ในกล่อง ⚙️ ตั้งค่าระบบ
+      บอทจะเริ่มส่ง QR code ให้ลูกค้าสแกนไปสั่งเองอัตโนมัติ
+    </li>
+  </ol>
+  <div class="note">
+    <strong>ถ้าเว็บส่ง <code>line_user_id</code> มาด้วย</strong> (ผ่าน LINE Login หรือ LIFF)
+    บอทจะรู้เลยว่าออเดอร์ไหนเป็นของใคร ลูกค้าถามว่า “ของถึงไหนแล้ว” ได้โดยไม่ต้องบอกเลขออเดอร์
+  </div>
+</section>
+
+<footer>
+  อิ่มใจ (ImJai) Cafe &amp; Kitchen · คู่มือติดตั้งระบบ AI ตอบลูกค้าบน LINE OA<br>
+  รายละเอียดเชิงเทคนิคทั้งหมดอยู่ในไฟล์ README.md ของโปรเจกต์
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var boxes = document.querySelectorAll('[data-step]');
+  var pn = document.getElementById('pn');
+  var pf = document.getElementById('pf');
+
+  function sync(){
+    var done = 0;
+    boxes.forEach(function(b){
+      var step = b.closest('.step');
+      if (b.checked){ done++; step.classList.add('done'); }
+      else { step.classList.remove('done'); }
+    });
+    pn.textContent = done;
+    pf.style.width = (done / boxes.length * 100) + '%';
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', sync); });
+  sync();
+
+  document.querySelectorAll('.cbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var code = btn.parentNode.querySelector('code');
+      var text = code.textContent;
+      var done = function(){
+        btn.textContent = 'คัดลอกแล้ว';
+        btn.classList.add('ok');
+        setTimeout(function(){ btn.textContent = 'คัดลอก'; btn.classList.remove('ok'); }, 1600);
+      };
+      var fallback = function(){
+        var r = document.createRange();
+        r.selectNodeContents(code);
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(r);
+        btn.textContent = 'กด Ctrl+C';
+        setTimeout(function(){ btn.textContent = 'คัดลอก'; }, 2600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+      } else { fallback(); }
+    });
+  });
+})();
+</script>
