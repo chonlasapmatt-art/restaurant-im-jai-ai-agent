@@ -1,0 +1,8 @@
+# reverse proxy + ใบรับรอง HTTPS อัตโนมัติ (ฟรี) สำหรับ n8n
+# ใช้คู่กับ docker-compose.yml — ชี้โดเมนมาที่ IP ของ VPS ก่อน แล้วค่อยรัน
+#   caddy run --config ./Caddyfile
+# หรือใส่เป็น service เพิ่มใน docker-compose ก็ได้
+
+n8n.myshop.com {
+    reverse_proxy localhost:5678
+}

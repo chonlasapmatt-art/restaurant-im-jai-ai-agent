@@ -63,8 +63,80 @@
 | `data/Orders.csv` | ออเดอร์ตัวอย่าง 7 รายการ |
 | `data/Tickets.csv` | Ticket ร้องเรียนตัวอย่าง 10 รายการ |
 | `data/ConversationLogs.csv` | หัวคอลัมน์ log บทสนทนา (+ ตัวอย่าง 2 แถว) |
+| `deploy/docker-compose.yml` | สำหรับติดตั้ง n8n เองบน VPS (ตั้ง WEBHOOK_URL ให้แล้ว) |
+| `deploy/Caddyfile` | reverse proxy + HTTPS อัตโนมัติ |
 | `tests/run-tests.js` | รันทดสอบตรรกะจริงจากไฟล์ workflow |
 | `tests/guard-approval.js` | ตรวจว่าไม่มีทางลัดข้าม Human Approval |
+
+---
+
+## 0️⃣ เตรียม n8n ก่อน (ถ้ายังไม่มี)
+
+ระบบนี้ต้องการ n8n ที่ **เข้าถึงได้จากอินเทอร์เน็ตด้วย HTTPS** เพราะ LINE ต้องยิง webhook เข้ามา
+และแอดมินต้องเปิดลิงก์อนุมัติจาก Discord ได้ — เลือกได้ 3 ทาง
+
+| ทาง | เหมาะกับ | ค่าใช้จ่าย | ความยาก |
+|---|---|---|---|
+| **A. n8n Cloud** ⭐ แนะนำ | อยากใช้งานจริงเลย ไม่อยากดูแลเซิร์ฟเวอร์ | ทดลองฟรี 14 วัน แล้วประมาณ €24/เดือน | ⭐ ง่ายสุด |
+| **B. Self-host บน VPS** | อยากคุมค่าใช้จ่ายระยะยาว มีโดเมนอยู่แล้ว | VPS ~150–300 บาท/เดือน | ⭐⭐⭐ |
+| **C. เครื่องตัวเอง + ngrok** | แค่อยากลองเล่นก่อน | ฟรี | ⭐⭐ (URL เปลี่ยนทุกครั้งที่รีสตาร์ท) |
+
+> **ต้องเป็น n8n เวอร์ชัน 1.70 ขึ้นไป** (แนะนำเวอร์ชันล่าสุด) เพราะ workflow นี้ใช้
+> node แบบ `*Tool` และฟังก์ชัน `$fromAI()` ซึ่งมีในเวอร์ชันใหม่เท่านั้น
+
+### ทาง A — n8n Cloud (แนะนำ)
+
+1. สมัครที่ https://n8n.io → เลือกแพลน (มีทดลองฟรี)
+2. จะได้ URL มาเลย เช่น `https://myshop.app.n8n.cloud` — **จดไว้ ใช้เป็น `public_base_url`**
+3. ข้ามไปทำขั้นที่ 1 ได้เลย ไม่ต้องตั้งค่าอะไรเพิ่ม
+
+> ⚠️ n8n Cloud ตั้ง environment variable เองไม่ได้ ให้พิมพ์ค่าลับลงใน node ตรง ๆ ตามขั้นที่ 4
+
+### ทาง B — Self-host ด้วย Docker บน VPS
+
+```bash
+# 1. ชี้โดเมน (เช่น n8n.myshop.com) มาที่ IP ของ VPS ก่อน — รอ DNS อัปเดตสัก 5-30 นาที
+
+# 2. โคลนโปรเจกต์นี้ลง VPS
+git clone <repo-url> && cd restaurant-im-jai-ai-agent/deploy
+
+# 3. ตั้งค่า
+cp .env.example .env
+openssl rand -hex 32          # เอาค่าที่ได้ไปใส่ N8N_ENCRYPTION_KEY ใน .env
+nano .env                     # แก้ N8N_HOST เป็นโดเมนจริงของคุณ
+
+# 4. รัน n8n
+docker compose up -d
+docker compose logs -f        # ดูว่าขึ้นสำเร็จไหม กด Ctrl+C เพื่อออก
+
+# 5. เปิด HTTPS ด้วย Caddy (ออกใบรับรองให้อัตโนมัติ ฟรี)
+sudo apt install -y caddy
+sudo cp Caddyfile /etc/caddy/Caddyfile
+sudo nano /etc/caddy/Caddyfile   # แก้ n8n.myshop.com เป็นโดเมนจริง
+sudo systemctl restart caddy
+```
+
+เปิด `https://<โดเมนของคุณ>` แล้วสร้าง owner account เป็นอันเสร็จ
+
+> ⚠️ จุดที่คนพลาดบ่อยที่สุด: **ลืมตั้ง `WEBHOOK_URL`** ทำให้ n8n สร้าง webhook URL
+> เป็น `http://localhost:5678/...` แล้ว LINE ยิงเข้าไม่ได้ — ไฟล์ `docker-compose.yml`
+> ในโปรเจกต์นี้ตั้งให้แล้วจาก `N8N_HOST`
+
+### ทาง C — ลองเล่นบนเครื่องตัวเอง
+
+```bash
+# รัน n8n
+docker run -d --name n8n -p 5678:5678   -e GENERIC_TIMEZONE=Asia/Bangkok -e TZ=Asia/Bangkok   -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n:latest
+
+# เปิดให้เข้าจากภายนอกด้วย ngrok (ต้องสมัคร ngrok ก่อน)
+ngrok http 5678
+# จะได้ URL เช่น https://a1b2-xxx.ngrok-free.app  → ใช้เป็น public_base_url
+```
+
+จากนั้นรีสตาร์ท n8n ใหม่โดยเพิ่ม `-e WEBHOOK_URL=https://a1b2-xxx.ngrok-free.app/`
+
+> ⚠️ ngrok ฟรีจะเปลี่ยน URL ทุกครั้งที่รีสตาร์ท ต้องกลับไปแก้ทั้งใน LINE Console
+> และใน node `⚙️ Config` ทุกครั้ง — เหมาะกับทดลองเท่านั้น ไม่เหมาะใช้งานจริง
 
 ---
 
@@ -260,6 +332,52 @@ system prompt สั่งไว้ชัดว่า ถ้าลูกค้�
 | **1 webhook = 1 event** | โค้ดรองรับหลาย event ใน 1 request แต่ node หลัง AI Agent อ้างอิงด้วย `.first()` ถ้า LINE ส่งมาหลาย event พร้อมกัน (พบได้น้อยมาก) จะประมวลผลเฉพาะตัวแรก |
 | **`sheetName` โหมด By Name** | ถ้า n8n เวอร์ชันของคุณไม่รู้จักโหมดนี้ ให้เปิด node นั้นแล้วเลือกแท็บจาก dropdown ใหม่อีกครั้ง (แก้ครั้งเดียวจบ) |
 | **Mock Action API** | `Execute Action` ยิงไปที่ endpoint ตัวอย่าง ตั้ง `onError: continue` ไว้ ระบบจึงเดินต่อได้แม้ API ยังไม่มีจริง — **อย่าลืมเปลี่ยนเป็น API จริงก่อนใช้งานจริง** |
+
+---
+
+## ✅ เช็กลิสต์สิ่งที่ต้องทำทั้งหมด
+
+พิมพ์ออกมาไล่ติ๊กได้เลย — ช่องที่มี ⏱️ คือเวลาที่น่าจะใช้
+
+- [ ] ⏱️ 10 นาที — เตรียม n8n ให้เข้าถึงได้ด้วย HTTPS (ขั้นที่ 0)
+- [ ] ⏱️ 15 นาที — สร้าง Google Sheet 6 แท็บ แล้ว import CSV จากโฟลเดอร์ `data/` (ขั้นที่ 1)
+- [ ] ⏱️ 3 นาที — สร้าง Discord Webhook แล้วทดสอบด้วย `curl` (ขั้นที่ 2)
+- [ ] ⏱️ 10 นาที — สร้าง LINE Messaging API channel + ออก Channel Access Token
+- [ ] ⏱️ 5 นาที — เตรียม OpenAI API key (ต้องมีเครดิตในบัญชี ไม่งั้น agent จะ error)
+- [ ] ⏱️ 10 นาที — สร้าง Google Cloud OAuth client สำหรับ Google Sheets
+- [ ] ⏱️ 2 นาที — import `workflow/imjai-line-ai-agent.json` เข้า n8n (ขั้นที่ 3)
+- [ ] ⏱️ 5 นาที — แก้ค่าใน node `⚙️ Config` + อีก 3 node ที่มีค่าลับ (ขั้นที่ 4)
+- [ ] ⏱️ 10 นาที — ผูก credential ทั้ง 3 ชุดเข้ากับ node (ขั้นที่ 5)
+- [ ] ⏱️ 5 นาที — Activate workflow แล้วตั้ง Webhook URL ใน LINE Console + กด Verify (ขั้นที่ 6)
+- [ ] ⏱️ 2 นาที — ตั้ง Error Workflow ให้ชี้กลับมาที่ workflow นี้เอง
+- [ ] ⏱️ 15 นาที — ทดสอบตามตาราง 8 ข้อความในหัวข้อ "วิธีทดสอบเบื้องต้น"
+- [ ] ⏱️ 5 นาที — ทดสอบกดอนุมัติจากลิงก์ใน Discord แล้วเช็กว่า Ticket เปลี่ยนสถานะ
+
+**รวมประมาณ 1.5 ชั่วโมง** ถ้ามี account ทั้งหมดพร้อมแล้ว
+
+### หลังใช้งานจริงได้แล้ว ค่อยทำต่อ
+
+| ลำดับ | สิ่งที่ควรทำ | ทำไม |
+|---|---|---|
+| 1 | เปลี่ยน `mock_api_base` เป็น API จริงของร้าน (ระบบ POS / payment gateway) | ตอนนี้ node `Execute Action` ยิงไปที่ endpoint ปลอม ตั้ง `onError: continue` ไว้ ระบบจึงเดินต่อได้แม้ยิงไม่สำเร็จ — **สถานะ ticket จะขึ้นว่าดำเนินการแล้วทั้งที่ยังไม่มีการคืนเงินจริง** |
+| 2 | เอาข้อมูลจริงของร้านใส่ใน 5 แท็บแรก แทน mock data | ตอนนี้เป็นเมนู/ออเดอร์ตัวอย่างจาก PDF |
+| 3 | ดู `ConversationLogs` ทุกสัปดาห์ | หาว่าลูกค้าถามอะไรบ่อยแล้วยังตอบไม่ได้ → เพิ่มเข้า `KnowledgeBase` |
+| 4 | ปรับ system prompt จากเคสจริง | แก้ที่ `docs/system-prompt.md` แล้วคัดลอกไปวางที่ node `AI Agent` |
+| 5 | ตั้ง Rich Menu ใน LINE OA | ให้ลูกค้ากดเมนู/โปรโมชัน/สมัครสมาชิกได้โดยไม่ต้องพิมพ์ |
+| 6 | ต่อหน้าเว็บ (ตามที่คุยกันไว้) | ดูหัวข้อ "ส่วนที่จะทำต่อ" ด้านล่าง |
+
+### ค่าใช้จ่ายที่ต้องเผื่อไว้ต่อเดือน
+
+| รายการ | ประมาณการ |
+|---|---|
+| n8n Cloud (ถ้าเลือกทาง A) | ~€24 (~900 บาท) |
+| หรือ VPS (ถ้าเลือกทาง B) | 150–300 บาท |
+| OpenAI API | ขึ้นกับปริมาณแชท — ประมาณ 0.05–0.15 บาท/ข้อความ (gpt-4.1) ถ้าวันละ 100 ข้อความ ตกราว 150–450 บาท/เดือน |
+| LINE Messaging API | ฟรี 500 ข้อความ push/เดือน (reply ไม่นับ) เกินกว่านั้นมีแพลนรายเดือน |
+| Google Sheets / Discord | ฟรี |
+
+> 💡 ประหยัดค่า OpenAI ได้โดยเปลี่ยน model ที่ node `OpenAI Chat Model` เป็น `gpt-4.1-mini`
+> (ถูกลงหลายเท่า) แล้วทดสอบว่าคุณภาพการจำแนก sentiment / high-risk ยังรับได้ไหม
 
 ---
 

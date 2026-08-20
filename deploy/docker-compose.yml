@@ -1,0 +1,46 @@
+# n8n สำหรับระบบ AI Customer Service ร้านอิ่มใจ
+# ใช้กับ VPS ที่มีโดเมนจริง (แนะนำ) — ต่อ reverse proxy อีกชั้นด้วย Caddy/Nginx
+#
+#   1. cp .env.example .env  แล้วแก้ค่าใน .env
+#   2. docker compose up -d
+#   3. เปิด https://<โดเมนของคุณ>  แล้วสร้าง owner account
+#
+# ⚠️ WEBHOOK_URL สำคัญมาก ถ้าไม่ตั้ง n8n จะสร้าง webhook URL เป็น localhost
+#    ทำให้ LINE ยิงเข้าไม่ได้ และลิงก์อนุมัติใน Discord จะเปิดไม่ได้
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: imjai-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # ── ที่อยู่สาธารณะ (ต้องเป็น https ที่ LINE เข้าถึงได้จริง) ──
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - WEBHOOK_URL=https://${N8N_HOST}/
+      - N8N_EDITOR_BASE_URL=https://${N8N_HOST}/
+
+      # ── เขตเวลา (มีผลกับ $now ใน workflow และเวลาที่บันทึกลง Sheet) ──
+      - GENERIC_TIMEZONE=Asia/Bangkok
+      - TZ=Asia/Bangkok
+
+      # ── ความปลอดภัย ──
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false   # ให้ Code node อ่าน env ด้านล่างได้
+
+      # ── ค่าลับของระบบอิ่มใจ (ทางเลือก: ตั้งที่นี่แทนการพิมพ์ใน node) ──
+      - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
+      - IMJAI_APPROVAL_SECRET=${IMJAI_APPROVAL_SECRET}
+      - IMJAI_DISCORD_WEBHOOK=${IMJAI_DISCORD_WEBHOOK}
+
+      # ── เก็บ execution ไว้ 14 วันพอ กันดิสก์เต็ม ──
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=336
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
