@@ -54,8 +54,11 @@
 | `Customers` | **สร้างแท็บใหม่** | line_user_id, customer_name, phone, address, last_contact_at |
 | `Tickets` | **สร้างแท็บใหม่** | ticket_id, created_at, line_user_id, order_id, category, action_requested, is_high_risk, message, status |
 
-มีไฟล์ตัวอย่างพร้อมข้อมูลตั้งต้นให้ในโฟลเดอร์ `data/v2/` — import ทีละแท็บผ่าน **File → Import → Upload → Replace current sheet** ได้เลย
-(`Menu_FAQ.csv` ในนี้แปลงจาก `data/Products.csv` + `data/KnowledgeBase.csv` เดิมให้แล้ว ใช้แทนหรือดูเป็นตัวอย่างฟอร์แมตก็ได้)
+**วิธีเร็วที่สุด:** ใช้ `data/v2/ImJai_Database_v2.xlsx` — ไฟล์เดียวมีครบทั้ง 5 แท็บ + แท็บ "อ่านก่อนใช้" อธิบายแต่ละคอลัมน์
+ลากขึ้น Google Drive → คลิกขวา → **Open with → Google Sheets** → **File → Save as Google Sheets** ได้ครบทุกแท็บในคลิกเดียว
+
+หรือถ้าอยากทำเอง มีไฟล์ CSV แยกทีละแท็บให้ในโฟลเดอร์ `data/v2/` เช่นกัน — import ทีละแท็บผ่าน **File → Import → Upload → Replace current sheet**
+(`Menu_FAQ.csv` แปลงจาก `data/Products.csv` + `data/KnowledgeBase.csv` เดิมให้แล้ว)
 
 หลังสร้างแท็บ `Customers` และ `Tickets` เสร็จ ให้เปิด node **`Save Customer Tool`** และ **`Create Ticket Tool`** ใน n8n
 แล้วเลือกแท็บจาก dropdown `sheetName` ใหม่อีกครั้ง (ไฟล์ตั้ง gid ชั่วคราวไว้ n8n จะขึ้นเตือนให้เลือกใหม่เอง)
