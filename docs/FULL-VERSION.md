@@ -48,19 +48,31 @@
                     └─► Log ผลการอนุมัติลง ConversationLogs
 ```
 
+**ระบบยืนยันการชำระเงิน (แยก trigger ต่างหาก ไม่ผ่าน AI Agent):**
+
+```
+ระบบชำระเงิน/QR ยิงมาบอกว่าจ่ายแล้ว
+        │
+        ▼
+[Payment Webhook] → ตรวจ secret + order_id/amount ครบไหม → หาแถวใน Orders
+        │
+        ├── เจอออเดอร์ → อัปเดต payment_status = ชำระแล้ว → Push แจ้งลูกค้า (LINE) → log Discord → 200 OK
+        └── หาไม่เจอ   → ไม่แตะชีต → แจ้งแอดมินให้ตรวจเองใน Discord → 404
+```
+
 ---
 
 ## 📦 ไฟล์ในโปรเจกต์
 
 | ไฟล์ | คำอธิบาย |
 |---|---|
-| `workflow/imjai-line-ai-agent.json` | **ไฟล์ n8n workflow** — import แล้วใช้ได้ทันที (40 node + sticky note) |
+| `workflow/imjai-line-ai-agent-full.json` | **ไฟล์ n8n workflow** — import แล้วใช้ได้ทันที (58 node + 6 sticky note รวมส่วนยืนยันการชำระเงิน) |
 | `docs/system-prompt.md` | System prompt ฉบับเต็มของน้องอิ่มใจ (ฝังอยู่ใน workflow แล้ว) |
 | `docs/TEST_CASES.md` | สรุปผลทดสอบ 18 เคส |
 | `data/StoreProfile.csv` | ข้อมูลร้าน 18 แถว |
 | `data/KnowledgeBase.csv` | FAQ 15 ข้อ |
-| `data/Products.csv` | เมนู 17 รายการ (กาแฟ 5 / non-coffee 4 / อาหาร 5 / ของหวาน 3) |
-| `data/Orders.csv` | ออเดอร์ตัวอย่าง 7 รายการ |
+| `data/Products.csv` | เมนู 17 รายการ (กาแฟ 5 / non-coffee 4 / อาหาร 5 / ของหวาน 3) — มีคอลัมน์ `is_recommended` ไว้กำหนด "เมนูแนะนำ" ตายตัว กันบอทเลือกไม่ตรงกันเวลาถูกถามซ้ำ |
+| `data/Orders.csv` | ออเดอร์ตัวอย่าง 3 รายการ — มีคอลัมน์ `payment_status` / `payment_ref` / `paid_at` สาธิตทั้งสถานะรอชำระเงินและชำระแล้ว |
 | `data/Tickets.csv` | Ticket ร้องเรียนตัวอย่าง 10 รายการ |
 | `data/ConversationLogs.csv` | หัวคอลัมน์ log บทสนทนา (+ ตัวอย่าง 2 แถว) |
 | `deploy/docker-compose.yml` | สำหรับติดตั้ง n8n เองบน VPS (ตั้ง WEBHOOK_URL ให้แล้ว) |
@@ -162,6 +174,10 @@ ngrok http 5678
 
    `StoreProfile` · `KnowledgeBase` · `Products` · `Orders` · `Tickets` · `ConversationLogs`
 
+   > 💡 แท็บ `Products` มีคอลัมน์ `is_recommended` (TRUE/FALSE) และแท็บ `Orders` มีคอลัมน์
+   > `payment_status` / `payment_ref` / `paid_at` — import จาก `data/Products.csv` และ `data/Orders.csv`
+   > ตรง ๆ จะได้ครบทุกคอลัมน์อัตโนมัติ ไม่ต้องเพิ่มเอง
+
 3. import ข้อมูลลงแต่ละแท็บ — เปิดแท็บที่ต้องการ แล้วไปที่
    **File → Import → Upload** → เลือกไฟล์ CSV ในโฟลเดอร์ `data/` →
    เลือก **Import location: `Replace current sheet`** → **Separator type: `Comma`** → กด Import
@@ -189,7 +205,7 @@ ngrok http 5678
 ### ขั้นที่ 3 — Import workflow เข้า n8n
 
 1. เปิด n8n → มุมขวาบน **⋯ → Import from File**
-2. เลือก `workflow/imjai-line-ai-agent.json`
+2. เลือก `workflow/imjai-line-ai-agent-full.json`
 3. n8n จะเตือนว่าหา credential ไม่เจอ — ไม่ต้องตกใจ เดี๋ยวไปผูกในขั้นที่ 5
 
 ### ขั้นที่ 4 — ตั้งค่าที่ node `⚙️ Config` (จุดเดียวจบ)
@@ -204,14 +220,16 @@ ngrok http 5678
 | `approval_secret` | ตั้งรหัสลับอะไรก็ได้ที่เดายาก เช่น `imjai-Xq82!kd93` |
 | `mock_api_base` | ปล่อยไว้ก่อนได้ (`https://api.imjai-cafe.example.com/v1`) แล้วค่อยเปลี่ยนเป็น API จริงของร้าน |
 | `admin_contact_note` | ข้อความท้ายการ์ด Discord |
+| `payment_webhook_secret` | ตั้งรหัสลับอะไรก็ได้ที่เดายาก ใช้ยืนยันว่า webhook แจ้งชำระเงิน (ขั้นที่ 7) มาจากระบบชำระเงินจริง |
 
-จากนั้นแก้อีก **2 จุดที่อยู่นอก Config** (เพราะเป็น node ที่ทำงานคนละ execution):
+จากนั้นแก้อีก **4 จุดที่อยู่นอก Config** (เพราะเป็น node ที่ทำงานคนละ execution):
 
 | node | แก้ตัวแปร | ใส่อะไร |
 |---|---|---|
 | `Verify LINE Signature` | `CHANNEL_SECRET` (บรรทัดบน ๆ) | LINE Channel Secret |
 | `Build Approval Confirm Page` | `SECRET` | ใส่ค่า **เดียวกับ** `approval_secret` |
 | `Build System Error Alert` | `WEBHOOK` | ใส่ค่า **เดียวกับ** `discord_webhook_url` |
+| `⚙️ Payment Config` | `sheet_id`, `discord_webhook_url`, `payment_webhook_secret` | ใส่ค่า **เดียวกับ** node `⚙️ Config` ด้านบน (คนละ trigger เลยอ่านค่ากันไม่ได้ ต้องคัดลอกซ้ำ) |
 
 > 💡 ถ้า n8n ของคุณตั้ง environment variable ได้ (self-host) จะตั้งเป็น
 > `LINE_CHANNEL_SECRET`, `IMJAI_APPROVAL_SECRET`, `IMJAI_DISCORD_WEBHOOK` แทนก็ได้ โค้ดรองรับไว้แล้ว
@@ -221,8 +239,8 @@ ngrok http 5678
 | node | ประเภท credential | วิธีตั้ง |
 |---|---|---|
 | `OpenAI Chat Model` | **OpenAI** | ใส่ API key |
-| Google Sheets ทุก node (7 node) | **Google Sheets OAuth2 API** | ตั้งอันเดียวแล้วเลือกซ้ำได้ทุก node |
-| `Reply:` และ `Push` ทุก node (5 node) | **Header Auth** | **Name:** `Authorization` · **Value:** `Bearer <LINE Channel Access Token>` |
+| Google Sheets ทุก node (11 node: อ่าน/เขียนตรง 7 + AI tool 4) | **Google Sheets OAuth2 API** | ตั้งอันเดียวแล้วเลือกซ้ำได้ทุก node |
+| `Reply:` และ `Push` ทุก node (7 node) | **Header Auth** | **Name:** `Authorization` · **Value:** `Bearer <LINE Channel Access Token>` |
 
 > ✅ ทริค: ตั้งชื่อ credential ว่า `Google Sheets account`, `OpenAi account`, `LINE Channel Access Token`
 > ตรงตามที่ workflow อ้างอิงไว้ n8n จะผูกให้อัตโนมัติทุก node
@@ -239,6 +257,48 @@ ngrok http 5678
    - **Greeting messages:** เปิดหรือปิดก็ได้
 4. ตั้ง Error Workflow (ให้แจ้งแอดมินเมื่อระบบพัง):
    ในหน้า workflow → **⋯ → Settings → Error Workflow** → เลือก workflow นี้เอง
+
+### ขั้นที่ 7 — ผูกระบบยืนยันการชำระเงิน (Payment Confirmation)
+
+เมื่อลูกค้าจ่ายเงินจริงแล้ว (สแกน QR / โอน / บัตร) ให้ระบบชำระเงินของคุณ (payment gateway,
+ระบบ POS หรือแอดมินเอง) ยิง POST มาที่ webhook นี้ — ระบบจะอัปเดตชีต `Orders` ให้อัตโนมัติ
+พร้อม **พุชแจ้งลูกค้าทาง LINE ทันที** ว่าได้รับเงินแล้ว และ log เข้า Discord ให้ทีมงานเห็น
+
+1. เปิด node `Payment Webhook` → คัดลอก **Production URL**
+   จะได้หน้าตาแบบ `https://n8n.myshop.com/webhook/imjai-payment-confirm`
+2. ตั้งให้ระบบชำระเงิน/QR ของคุณยิง `POST` มาที่ URL นี้เมื่อมีการจ่ายเงินสำเร็จ ด้วย body ประมาณนี้:
+
+   ```json
+   {
+     "order_id": "ORD-20260820-002",
+     "amount": 110,
+     "payment_ref": "TXN123456",
+     "method": "PromptPay",
+     "secret": "<ค่าเดียวกับ payment_webhook_secret>"
+   }
+   ```
+
+   (ส่ง `secret` ในฟิลด์ `secret` ของ body หรือ header `x-payment-secret` ก็ได้ — ถ้ายังไม่มีระบบชำระเงินที่ยิง
+   webhook ได้เอง ให้แอดมินยิงเองด้วย `curl`/Postman เมื่อเช็คเงินเข้าบัญชีร้านแล้วก็ได้ ใช้งานได้เหมือนกัน)
+
+3. ผลลัพธ์ที่ได้กลับมา:
+   - `200 { "ok": true, ... }` — เจอออเดอร์ อัปเดต `payment_status = ชำระแล้ว` และแจ้งลูกค้าแล้ว
+   - `400 { "ok": false, "error": "missing_order_id_or_amount" }` — body ส่งมาไม่ครบ
+   - `401 { "ok": false, "error": "invalid_secret" }` — secret ไม่ตรง
+   - `404 { "ok": false, "error": "order_not_found" }` — หาเลขออเดอร์นี้ในชีต Orders ไม่เจอ
+     (ระบบจะไม่แตะชีตเลย และแจ้งแอดมินทาง Discord ให้ตรวจสอบเอง)
+4. ทดสอบด้วย `curl`:
+   ```bash
+   curl -X POST 'https://n8n.myshop.com/webhook/imjai-payment-confirm' \
+        -H 'Content-Type: application/json' \
+        -d '{"order_id":"ORD-20260820-183000","amount":110,"payment_ref":"TEST-001","secret":"<payment_webhook_secret>"}'
+   ```
+   แล้วเช็คว่าคอลัมน์ `payment_status` ในชีต Orders เปลี่ยนเป็น `ชำระแล้ว` และลูกค้า (ถ้ามี `line_user_id`
+   ผูกไว้ในแถวนั้น) ได้รับข้อความยืนยันทาง LINE
+
+> จุดนี้เป็น **จุดเดียวใน workflow นี้ที่ n8n เขียนทับชีต Orders** (เขียนเฉพาะ 3 คอลัมน์ `payment_status` /
+> `payment_ref` / `paid_at` เท่านั้น ไม่แตะสถานะครัวหรือคอลัมน์อื่น) — ถ้ายังไม่มี QR/ระบบชำระเงินจริง
+> ข้ามขั้นตอนนี้ไปก่อนได้ ระบบส่วนอื่นทำงานได้ตามปกติ แล้วค่อยกลับมาผูกทีหลังก็ได้
 
 ---
 
@@ -345,11 +405,12 @@ system prompt สั่งไว้ชัดว่า ถ้าลูกค้�
 - [ ] ⏱️ 10 นาที — สร้าง LINE Messaging API channel + ออก Channel Access Token
 - [ ] ⏱️ 5 นาที — เตรียม OpenAI API key (ต้องมีเครดิตในบัญชี ไม่งั้น agent จะ error)
 - [ ] ⏱️ 10 นาที — สร้าง Google Cloud OAuth client สำหรับ Google Sheets
-- [ ] ⏱️ 2 นาที — import `workflow/imjai-line-ai-agent.json` เข้า n8n (ขั้นที่ 3)
-- [ ] ⏱️ 5 นาที — แก้ค่าใน node `⚙️ Config` + อีก 3 node ที่มีค่าลับ (ขั้นที่ 4)
+- [ ] ⏱️ 2 นาที — import `workflow/imjai-line-ai-agent-full.json` เข้า n8n (ขั้นที่ 3)
+- [ ] ⏱️ 5 นาที — แก้ค่าใน node `⚙️ Config` + อีก 4 node ที่มีค่าลับ (ขั้นที่ 4)
 - [ ] ⏱️ 10 นาที — ผูก credential ทั้ง 3 ชุดเข้ากับ node (ขั้นที่ 5)
 - [ ] ⏱️ 5 นาที — Activate workflow แล้วตั้ง Webhook URL ใน LINE Console + กด Verify (ขั้นที่ 6)
 - [ ] ⏱️ 2 นาที — ตั้ง Error Workflow ให้ชี้กลับมาที่ workflow นี้เอง
+- [ ] ⏱️ 5 นาที — ผูก webhook ยืนยันการชำระเงินเข้ากับระบบชำระเงิน/QR (หรือไว้แอดมินยิงเอง) แล้วทดสอบด้วย `curl` (ขั้นที่ 7)
 - [ ] ⏱️ 15 นาที — ทดสอบตามตาราง 8 ข้อความในหัวข้อ "วิธีทดสอบเบื้องต้น"
 - [ ] ⏱️ 5 นาที — ทดสอบกดอนุมัติจากลิงก์ใน Discord แล้วเช็กว่า Ticket เปลี่ยนสถานะ
 

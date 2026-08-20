@@ -57,13 +57,13 @@
 |---|---|---|
 | **StoreProfile** | key, value | ข้อมูลร้าน เวลาทำการ ที่ตั้ง นโยบาย (18 แถว) |
 | **KnowledgeBase** | id, category, question, answer, tags | FAQ 15 ข้อ |
-| **Products** | sku, name, category, price, description, allergens, is_available, promotion | เมนู 17 รายการ |
+| **Products** | sku, name, category, price, description, allergens, is_available, promotion, **is_recommended** | เมนู 17 รายการ |
 
 **ข้อมูลที่ระบบใช้งานอัตโนมัติ**
 
 | แท็บ | ใครเขียน | หน้าที่ |
 |---|---|---|
-| **Orders** | **เว็บสั่งอาหารเขียน** (n8n อ่านอย่างเดียว) | ออเดอร์จริง ใช้ตอบลูกค้าว่าอาหารถึงไหนแล้ว |
+| **Orders** | **เว็บสั่งอาหารเขียน** (n8n อ่านอย่างเดียว — ยกเว้นเวอร์ชันเต็มที่มี webhook ยืนยันการชำระเงินคอยอัปเดต 3 คอลัมน์ payment_* ให้อัตโนมัติ ดู [`docs/FULL-VERSION.md`](docs/FULL-VERSION.md)) | ออเดอร์จริง ใช้ตอบลูกค้าว่าอาหารถึงไหนแล้ว + สถานะการชำระเงิน แบบเรียลไทม์ |
 | **AIMemory** | AI เขียน / คุณติ๊กยืนยัน | คลังคำถาม-คำตอบ ยิ่งใช้ยิ่งแม่น |
 
 > 💡 **แยกแท็บตามชนิดข้อมูลเพื่อลดความผิดพลาดของ AI** — ถ้ายัดทุกอย่างรวมตารางเดียว
@@ -71,6 +71,10 @@
 >
 > ระบบยังแปลง `is_available` ให้ AI อ่านง่ายด้วย — `FALSE` จะถูกส่งเป็น **"⛔ หมด/ไม่พร้อมขาย"**
 > ไม่ใช่คำว่า FALSE เฉย ๆ ที่ AI อาจตีความพลาด
+>
+> คอลัมน์ `is_recommended` (TRUE/FALSE) ใน Products ใช้กำหนด "เมนูแนะนำ" ไว้ตายตัวล่วงหน้า
+> (คำนวณไว้ในโค้ดก่อนส่งให้ AI) เพื่อกันปัญหาบอทแนะนำเมนูไม่ตรงกันเวลาลูกค้าถามซ้ำ — ไปติ๊ก TRUE
+> ที่แถวเมนูที่อยากให้บอทแนะนำได้เลย ไม่ต้องแก้โค้ด
 
 ### AIMemory ทำงานยังไง
 
@@ -201,7 +205,7 @@ node tests/run-tests-lite.js     # 25 เคส
 | `data/*.csv` | ข้อมูลตั้งต้นแยกไฟล์ (ถ้าอยาก import ทีละแท็บ) |
 | `tests/run-tests-lite.js` | ทดสอบตรรกะ 18 เคส |
 | `deploy/` | docker-compose + Caddyfile สำหรับ self-host |
-| `workflow/imjai-line-ai-agent-full.json` | เวอร์ชันเต็ม 40 node (มีระบบ Human Approval, 6 แท็บ) — ดู [`docs/FULL-VERSION.md`](docs/FULL-VERSION.md) |
+| `workflow/imjai-line-ai-agent-full.json` | เวอร์ชันเต็ม 58 node (มีระบบ Human Approval, 6 แท็บ, webhook ยืนยันการชำระเงิน) — ดู [`docs/FULL-VERSION.md`](docs/FULL-VERSION.md) |
 
 ---
 
@@ -209,11 +213,16 @@ node tests/run-tests-lite.js     # 25 เคส
 
 - **เว็บสั่งอาหาร** — รอคุณออกแบบ สิ่งที่เว็บต้องทำมีแค่ 2 อย่าง:
   1. รับออเดอร์ + เก็บเงิน
-  2. **เขียนออเดอร์ลงแท็บ `Orders`** ตามคอลัมน์เดิม (`order_id`, `created_at`, `line_user_id`, `customer_name`, `phone`, `items`, `total`, `order_type`, `status`, `eta`, `note`)
+  2. **เขียนออเดอร์ลงแท็บ `Orders`** ตามคอลัมน์เดิม (`order_id`, `created_at`, `line_user_id`, `customer_name`, `phone`, `items`, `total`, `order_type`, `status`, `eta`, `note`, `payment_status`, `payment_ref`, `paid_at`)
+     — 3 คอลัมน์ payment_* ปล่อยว่างไว้ก่อนได้ (บอทจะถือว่า "รอชำระเงิน" โดยอัตโนมัติ)
 
   เสร็จแล้วเอา URL มาใส่ `ORDER_WEB_URL` ใน node `⚙️ ตั้งค่าระบบ` บอทจะเริ่มส่ง QR ให้ลูกค้าทันที
   โดยไม่ต้องแก้อะไรอีก
 
   > 💡 ถ้าเว็บส่ง `line_user_id` มาด้วย (เช่นผ่าน LINE Login หรือ LIFF) บอทจะรู้ว่าออเดอร์ไหนเป็นของใคร
   > แล้วตอบเรื่องสถานะได้แม่นยำโดยลูกค้าไม่ต้องบอกเลขออเดอร์
+  >
+  > 💳 ถ้าอยากให้ระบบมาร์กว่า "ชำระแล้ว" ให้อัตโนมัติทันทีที่ลูกค้าจ่ายเงินจริง (พร้อมพุชแจ้งลูกค้าทาง LINE)
+  > แทนที่จะให้เว็บเขียนเอง เวอร์ชันเต็มมี webhook `imjai-payment-confirm` ไว้ให้แล้ว — ดูวิธีผูกที่
+  > [`docs/FULL-VERSION.md`](docs/FULL-VERSION.md) หัวข้อ "ขั้นที่ 7"
 - **ระบบอนุมัติคืนเงิน/ยกเลิกอัตโนมัติ** — มีอยู่ในเวอร์ชันเต็มแล้ว ตอนนี้ให้แอดมินจัดการเองผ่าน LINE OA
