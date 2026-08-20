@@ -1,6 +1,6 @@
 // รัน logic จริงที่อยู่ใน workflow JSON (ไม่ได้เขียนโค้ดจำลองใหม่)
 const fs = require('fs');
-const wf = JSON.parse(fs.readFileSync('workflow/imjai-line-ai-agent.json', 'utf8'));
+const wf = JSON.parse(fs.readFileSync('workflow/imjai-line-ai-agent-full.json', 'utf8'));
 const node = (n) => wf.nodes.find((x) => x.name === n);
 
 // ---------- 1) ดึง "สมการจริง" จาก Complaint Ticket Tool ----------

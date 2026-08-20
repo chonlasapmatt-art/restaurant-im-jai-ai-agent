@@ -1,5 +1,5 @@
 // พิสูจน์เชิงโครงสร้าง: ทุกเส้นทางที่ไปถึง node ที่ "ลงมือทำจริง" ต้องผ่าน Wait node
-const wf = JSON.parse(require('fs').readFileSync('workflow/imjai-line-ai-agent.json', 'utf8'));
+const wf = JSON.parse(require('fs').readFileSync('workflow/imjai-line-ai-agent-full.json', 'utf8'));
 const WAIT = '⏸ Wait for Human Approval';
 const ACTION_NODES = [
   'Execute Action (Mock Refund/Cancel/Discount API)',

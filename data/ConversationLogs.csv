@@ -1,3 +1,0 @@
-﻿log_id,timestamp,line_user_id,direction,message,intent,sentiment,tools_called,ticket_id,requires_human_approval
-LOG-000001,2026-08-20 13:00:12,Uabc123line,inbound,ร้านมีที่จอดรถให้ลูกค้าเพิ่มไหม,faq,Neutral,search_knowledge_base,,FALSE
-LOG-000002,2026-08-20 13:00:15,Uabc123line,outbound,มีที่จอดรถหน้าร้าน 6 คันค่ะ ช่วงเวลาเร่งด่วนที่จอดอาจมีจำกัดนะคะ,faq,Neutral,search_knowledge_base,,FALSE
