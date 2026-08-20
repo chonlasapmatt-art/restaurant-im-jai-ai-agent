@@ -1,0 +1,608 @@
+[
+  {
+    "id": "TC-01",
+    "name": "FAQ — ถามเวลาเปิดปิด",
+    "type": "FAQ",
+    "customer": "ร้านเปิดกี่โมงคะ",
+    "ai": {
+      "tools": [
+        "Knowledge Tool"
+      ],
+      "reply": "เปิดทุกวัน 07:00–20:00 น. ครัวปิดรับออเดอร์ 19:30 น. ค่ะ"
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": ""
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": ""
+  },
+  {
+    "id": "TC-02",
+    "name": "Product — ถามราคาลาเต้",
+    "type": "Product",
+    "customer": "ลาเต้เย็นราคาเท่าไหร่คะ",
+    "ai": {
+      "tools": [
+        "Product Tool"
+      ],
+      "reply": "ลาเต้ (ร้อน/เย็น) แก้วละ 70 บาทค่ะ มีโปรซื้อคู่เบเกอรีลด 15 บาทด้วยนะคะ"
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": ""
+  },
+  {
+    "id": "TC-03",
+    "name": "Product — เมนูของหมด + สารก่อภูมิแพ้",
+    "type": "Product",
+    "customer": "ต้มยำกุ้งน้ำข้นมีไหมคะ แพ้กุ้งเปล่า",
+    "ai": {
+      "tools": [
+        "Product Tool"
+      ],
+      "reply": "ต้มยำกุ้งน้ำข้น (150 บาท) วันนี้ของหมดแล้วค่ะ 🙏 เมนูนี้มีกุ้งและนมเป็นสารก่อภูมิแพ้นะคะ แนะนำสลัดอกไก่ย่างซอสงาแทนได้ค่ะ"
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": ""
+  },
+  {
+    "id": "TC-04",
+    "name": "Order Status — เช็คด้วยเลขออเดอร์",
+    "type": "Order",
+    "customer": "เช็คออเดอร์ ORD-20260819-014 ให้หน่อยค่ะ",
+    "ai": {
+      "tools": [
+        "Order Tool"
+      ],
+      "reply": "ออเดอร์ ORD-20260819-014 กำลังจัดส่งค่ะ ยอดรวม 280 บาท ถึงประมาณ 19:50 น. นะคะ"
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": ""
+  },
+  {
+    "id": "TC-05",
+    "name": "Order Status — ไม่พบเลขออเดอร์ (ไม่มั่นใจ)",
+    "type": "Order",
+    "customer": "ออเดอร์ ORD-99999999-999 ถึงไหนแล้วคะ",
+    "ai": {
+      "tools": [
+        "Order Tool"
+      ],
+      "reply": "ขออภัยค่ะ น้องอิ่มใจไม่พบเลขออเดอร์นี้ในระบบ รบกวนตรวจสอบอีกครั้งได้ไหมคะ"
+    },
+    "expect": {
+      "route": "urgent_contact",
+      "approval": false
+    },
+    "got": {
+      "route": "urgent_contact",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": "คำตอบส่อว่าไม่มั่นใจ"
+  },
+  {
+    "id": "TC-06",
+    "name": "Complaint Positive — คำชม",
+    "type": "Complaint",
+    "customer": "อาหารอร่อยมาก บริการดีค่ะ",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "ขอบคุณมากเลยค่ะ 🥰 น้องอิ่มใจจะส่งคำชมให้ทีมงานทุกคนนะคะ",
+      "tool_call": {
+        "customer_message": "อาหารอร่อยมาก บริการดีค่ะ",
+        "category": "compliment",
+        "sentiment": "Positive",
+        "action_requested": "none",
+        "is_high_risk": false
+      }
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "Positive",
+      "status": "open"
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "Positive",
+      "high_risk": false,
+      "status": "open",
+      "assigned_to": "ai_agent"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "compliment",
+      "message": "อาหารอร่อยมาก บริการดีค่ะ",
+      "sentiment": "Positive",
+      "order_id": "",
+      "is_high_risk": "FALSE",
+      "action_requested": "none",
+      "requires_human_approval": "FALSE",
+      "status": "open",
+      "assigned_to": "ai_agent"
+    },
+    "reason": ""
+  },
+  {
+    "id": "TC-07",
+    "name": "Complaint Neutral + Cancel Order → ต้องอนุมัติ",
+    "type": "Complaint",
+    "customer": "ขอยกเลิกออเดอร์ ORD-20260820-004 ค่ะ",
+    "ai": {
+      "tools": [
+        "Order Tool",
+        "Complaint Ticket Tool"
+      ],
+      "reply": "น้องอิ่มใจรับเรื่องขอยกเลิกไว้แล้วนะคะ เลขที่เรื่อง TK-260820-120000 ส่งให้ทีมงานพิจารณาแล้วค่ะ",
+      "tool_call": {
+        "customer_message": "ขอยกเลิกออเดอร์ ORD-20260820-004 ค่ะ",
+        "category": "order",
+        "sentiment": "Neutral",
+        "order_id": "ORD-20260820-004",
+        "action_requested": "cancel_order",
+        "is_high_risk": false
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Neutral",
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Neutral",
+      "high_risk": false,
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "order",
+      "message": "ขอยกเลิกออเดอร์ ORD-20260820-004 ค่ะ",
+      "sentiment": "Neutral",
+      "order_id": "ORD-20260820-004",
+      "is_high_risk": "FALSE",
+      "action_requested": "cancel_order",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "reason": "ต้องขออนุมัติ: cancel_order"
+  },
+  {
+    "id": "TC-08",
+    "name": "Complaint Negative — กาแฟหวานไป (ไม่ต้องอนุมัติ)",
+    "type": "Complaint",
+    "customer": "กาแฟหวานไปหน่อยค่ะ ปรับได้ไหม",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "ขออภัยด้วยนะคะ 🙏 น้องอิ่มใจแจ้งบาริสต้าให้แล้วค่ะ ครั้งหน้าแจ้งระดับความหวานได้เลยนะคะ",
+      "tool_call": {
+        "customer_message": "กาแฟหวานไปหน่อยค่ะ ปรับได้ไหม",
+        "category": "product_quality",
+        "sentiment": "Negative",
+        "action_requested": "none",
+        "is_high_risk": false
+      }
+    },
+    "expect": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "Negative",
+      "status": "open",
+      "assigned_to": "ai_agent"
+    },
+    "got": {
+      "route": "normal",
+      "approval": false,
+      "sentiment": "Negative",
+      "high_risk": false,
+      "status": "open",
+      "assigned_to": "ai_agent"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "product_quality",
+      "message": "กาแฟหวานไปหน่อยค่ะ ปรับได้ไหม",
+      "sentiment": "Negative",
+      "order_id": "",
+      "is_high_risk": "FALSE",
+      "action_requested": "none",
+      "requires_human_approval": "FALSE",
+      "status": "open",
+      "assigned_to": "ai_agent"
+    },
+    "reason": ""
+  },
+  {
+    "id": "TC-09",
+    "name": "Complaint Negative + Refund (ตัดเงินซ้ำ) → ต้องอนุมัติ",
+    "type": "Complaint",
+    "customer": "โดนตัดเงินซ้ำ 2 ครั้ง ขอเงินคืนค่ะ",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "ขออภัยอย่างสูงค่ะ น้องอิ่มใจรับเรื่องไว้แล้ว เลขที่เรื่อง TK-260820-120000 ส่งให้ทีมการเงินตรวจสอบแล้วค่ะ",
+      "tool_call": {
+        "customer_message": "โดนตัดเงินซ้ำ 2 ครั้ง ขอเงินคืนค่ะ",
+        "category": "billing",
+        "sentiment": "Negative",
+        "action_requested": "refund",
+        "is_high_risk": true
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Negative",
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Negative",
+      "high_risk": true,
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "billing",
+      "message": "โดนตัดเงินซ้ำ 2 ครั้ง ขอเงินคืนค่ะ",
+      "sentiment": "Negative",
+      "order_id": "",
+      "is_high_risk": "TRUE",
+      "action_requested": "refund",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "reason": "ต้องขออนุมัติ: refund + high-risk"
+  },
+  {
+    "id": "TC-10",
+    "name": "Complaint Very Negative + High-risk (เส้นผม) → Refund ต้องอนุมัติ",
+    "type": "Complaint",
+    "customer": "เจอเส้นผมในอาหารค่ะ แย่มาก ขอเงินคืน",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "น้องอิ่มใจต้องขออภัยอย่างสูงกับสิ่งที่เกิดขึ้นค่ะ เรื่องนี้ส่งให้หัวหน้าทีมทันทีแล้ว เลขที่เรื่อง TK-260820-120000 ค่ะ",
+      "tool_call": {
+        "customer_message": "เจอเส้นผมในอาหารค่ะ แย่มาก ขอเงินคืน",
+        "category": "product_quality",
+        "sentiment": "Very Negative",
+        "action_requested": "refund",
+        "is_high_risk": true
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "high_risk": true,
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Very Negative",
+      "high_risk": true,
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "product_quality",
+      "message": "เจอเส้นผมในอาหารค่ะ แย่มาก ขอเงินคืน",
+      "sentiment": "Very Negative",
+      "order_id": "",
+      "is_high_risk": "TRUE",
+      "action_requested": "refund",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "reason": "ต้องขออนุมัติ: refund + high-risk"
+  },
+  {
+    "id": "TC-11",
+    "name": "High-risk แต่ไม่ขออะไร (แพ้ถั่ว) → ยังต้องอนุมัติ",
+    "type": "Complaint",
+    "customer": "ลูกแพ้ถั่วรุนแรง กินเมนูนี้แล้วแน่นหน้าอก",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "น้องอิ่มใจขออภัยอย่างสูงค่ะ ขอให้ดูอาการอย่างใกล้ชิดและพบแพทย์ทันทีนะคะ เรื่องนี้ส่งให้ผู้จัดการร้านด่วนที่สุดแล้วค่ะ",
+      "tool_call": {
+        "customer_message": "ลูกแพ้ถั่วรุนแรง กินเมนูนี้แล้วแน่นหน้าอก",
+        "category": "food_safety",
+        "sentiment": "Very Negative",
+        "action_requested": "none",
+        "is_high_risk": true
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "high_risk": true,
+      "assigned_to": "store_manager"
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Very Negative",
+      "high_risk": true,
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "food_safety",
+      "message": "ลูกแพ้ถั่วรุนแรง กินเมนูนี้แล้วแน่นหน้าอก",
+      "sentiment": "Very Negative",
+      "order_id": "",
+      "is_high_risk": "TRUE",
+      "action_requested": "none",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "reason": "ต้องขออนุมัติ: none + high-risk"
+  },
+  {
+    "id": "TC-12",
+    "name": "Very Negative + Special Discount (ส่งช้า) → ต้องอนุมัติ",
+    "type": "Complaint",
+    "customer": "รอเกินเวลาที่แจ้ง 40 นาทีแล้ว ชดเชยหน่อยสิคะ",
+    "ai": {
+      "tools": [
+        "Order Tool",
+        "Complaint Ticket Tool"
+      ],
+      "reply": "ขออภัยอย่างสูงค่ะ น้องอิ่มใจรับเรื่องและส่งให้ทีมงานพิจารณาแล้ว เลขที่เรื่อง TK-260820-120000 ค่ะ",
+      "tool_call": {
+        "customer_message": "รอเกินเวลาที่แจ้ง 40 นาทีแล้ว ชดเชยหน่อยสิคะ",
+        "category": "delivery",
+        "sentiment": "Very Negative",
+        "order_id": "ORD-20260819-014",
+        "action_requested": "special_discount",
+        "is_high_risk": false
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Very Negative",
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Very Negative",
+      "high_risk": false,
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "delivery",
+      "message": "รอเกินเวลาที่แจ้ง 40 นาทีแล้ว ชดเชยหน่อยสิคะ",
+      "sentiment": "Very Negative",
+      "order_id": "ORD-20260819-014",
+      "is_high_risk": "FALSE",
+      "action_requested": "special_discount",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "support_lead"
+    },
+    "reason": "ต้องขออนุมัติ: special_discount"
+  },
+  {
+    "id": "TC-13",
+    "name": "ลูกค้าขอคุยแอดมิน → ยิงหาแอดมินทันที",
+    "type": "Escalate",
+    "customer": "ขอคุยกับแอดมินหน่อยค่ะ คุยกับบอทไม่รู้เรื่อง",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "ได้เลยค่ะ น้องอิ่มใจส่งเรื่องให้แอดมินแล้วนะคะ เลขที่เรื่อง TK-260820-120000 รอสักครู่ทีมงานจะเข้ามาตอบในแชทนี้ค่ะ",
+      "tool_call": {
+        "customer_message": "ขอคุยกับแอดมินหน่อยค่ะ",
+        "category": "general",
+        "sentiment": "Neutral",
+        "action_requested": "contact_admin",
+        "is_high_risk": false
+      }
+    },
+    "expect": {
+      "route": "urgent_contact",
+      "approval": false,
+      "status": "awaiting_admin_contact"
+    },
+    "got": {
+      "route": "urgent_contact",
+      "approval": false,
+      "sentiment": "Neutral",
+      "high_risk": false,
+      "status": "awaiting_admin_contact",
+      "assigned_to": "ai_agent"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "general",
+      "message": "ขอคุยกับแอดมินหน่อยค่ะ",
+      "sentiment": "Neutral",
+      "order_id": "",
+      "is_high_risk": "FALSE",
+      "action_requested": "contact_admin",
+      "requires_human_approval": "FALSE",
+      "status": "awaiting_admin_contact",
+      "assigned_to": "ai_agent"
+    },
+    "reason": "AI ส่งต่อเอง (contact_admin)"
+  },
+  {
+    "id": "TC-14",
+    "name": "นอกขอบเขต + ไม่เรียก tool → ตาข่ายกันพลาดส่งแอดมิน",
+    "type": "Escalate",
+    "customer": "ขอสูตรทำกะเพราแบบร้านหน่อยค่ะ เอาละเอียด ๆ",
+    "ai": {
+      "tools": [],
+      "reply": "เรื่องนี้น้องอิ่มใจตอบไม่ได้นะคะ แต่ถ้าเป็นเรื่องเมนูหรือออเดอร์ ยินดีช่วยเลยค่ะ"
+    },
+    "expect": {
+      "route": "urgent_contact",
+      "approval": false
+    },
+    "got": {
+      "route": "urgent_contact",
+      "approval": false,
+      "sentiment": "",
+      "high_risk": false,
+      "status": "-",
+      "assigned_to": "-"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": null,
+    "reason": "คำตอบส่อว่าไม่มั่นใจ"
+  },
+  {
+    "id": "TC-15",
+    "name": "ห้ามข้าม: high-risk + refund ต้องไม่มีทางลัดไป Execute Action",
+    "type": "Guard",
+    "customer": "เจอแมลงในอาหาร จะฟ้อง สคบ. ขอเงินคืนเดี๋ยวนี้",
+    "ai": {
+      "tools": [
+        "Complaint Ticket Tool"
+      ],
+      "reply": "น้องอิ่มใจขออภัยอย่างสูงค่ะ ส่งเรื่องให้ผู้จัดการร้านทันทีแล้ว เลขที่เรื่อง TK-260820-120000 ค่ะ",
+      "tool_call": {
+        "customer_message": "เจอแมลงในอาหาร จะฟ้อง สคบ. ขอเงินคืนเดี๋ยวนี้",
+        "category": "food_safety",
+        "sentiment": "Very Negative",
+        "action_requested": "refund",
+        "is_high_risk": true
+      }
+    },
+    "expect": {
+      "route": "approval",
+      "approval": true,
+      "high_risk": true
+    },
+    "got": {
+      "route": "approval",
+      "approval": true,
+      "sentiment": "Very Negative",
+      "high_risk": true,
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "ok": true,
+    "errs": [],
+    "ticket": {
+      "ticket_id": "TK-260820-120000",
+      "category": "food_safety",
+      "message": "เจอแมลงในอาหาร จะฟ้อง สคบ. ขอเงินคืนเดี๋ยวนี้",
+      "sentiment": "Very Negative",
+      "order_id": "",
+      "is_high_risk": "TRUE",
+      "action_requested": "refund",
+      "requires_human_approval": "TRUE",
+      "status": "pending_approval",
+      "assigned_to": "store_manager"
+    },
+    "reason": "ต้องขออนุมัติ: refund + high-risk"
+  }
+]
