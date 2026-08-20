@@ -202,6 +202,7 @@ node tests/run-tests-lite.js     # 25 เคส
 | `tests/run-tests-lite.js` | ทดสอบตรรกะ 18 เคส |
 | `deploy/` | docker-compose + Caddyfile สำหรับ self-host |
 | `workflow/imjai-line-ai-agent-full.json` | เวอร์ชันเต็ม 40 node (มีระบบ Human Approval, 6 แท็บ) — ดู [`docs/FULL-VERSION.md`](docs/FULL-VERSION.md) |
+| `workflow/imjai-line-ai-agent-v2.json` | 🆕 เวอร์ชัน 2 (Gemini) — **AI รับออเดอร์ในแชทได้จริง** + ทะเบียนลูกค้า (Customers) + ระบบยืนยันการชำระเงินหลังโอนจริง + แก้บั๊กตอบผิดพลาดหลายจุด — ดู [`docs/V2-ORDER-PAYMENT.md`](docs/V2-ORDER-PAYMENT.md) |
 
 ---
 

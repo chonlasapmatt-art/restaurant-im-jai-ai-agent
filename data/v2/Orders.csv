@@ -1,0 +1,2 @@
+order_id,created_at,line_user_id,customer_name,customer_phone,items,order_type,delivery_address,total_amount,status,payment_status,eta,paid_at,confirmed_by,note
+ORD-20260819-014,2026-08-19 18:10:00,Uabc123line,คุณส้ม,081-234-5671,"ลาเต้เย็น x1, ครัวซองต์เนยสด x1",pickup,-,125,ชำระเงินแล้ว - กำลังเตรียม,paid,18:30,2026-08-19 18:15:00,พนักงานเก็บเงิน,แถวตัวอย่าง ลบทิ้งได้

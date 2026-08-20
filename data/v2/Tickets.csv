@@ -1,0 +1,2 @@
+ticket_id,created_at,line_user_id,order_id,category,action_requested,is_high_risk,message,status
+TK-20260819-221,2026-08-19 12:05:00,Uxyz789line,ORD-20260818-071,complaint,ขอเงินคืนค่าจัดส่งซ้ำซ้อน,FALSE,ลูกค้าถูกเรียกเก็บค่าส่งสองรอบในออเดอร์เดียวกัน ขอเงินคืนส่วนต่าง,pending

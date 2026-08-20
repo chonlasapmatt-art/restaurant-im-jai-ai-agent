@@ -1,0 +1,2 @@
+timestamp,line_user_id,user_message,reply_text,intent,sentiment,need_admin,reason,order_id
+2026-08-19 18:09:40,Uabc123line,ขอสั่งลาเต้เย็น 1 แก้วกับครัวซองต์ 1 ชิ้นค่ะ มารับเองที่ร้าน,รับออเดอร์เรียบร้อยค่ะ ลาเต้เย็น x1 + ครัวซองต์เนยสด x1 รวม 125 บาท เลขที่ออเดอร์ ORD-20260819-014 เดี๋ยวส่ง QR ให้ชำระเงินนะคะ,order,Positive,FALSE,-,ORD-20260819-014
