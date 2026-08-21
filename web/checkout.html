@@ -103,10 +103,36 @@
         </label>
       </div>
 
-      <div id="promptpay-block" class="flex flex-col items-center gap-sm bg-surface-container-low rounded-lg p-lg">
-        <canvas id="ppQrCanvas" class="rounded-lg bg-white p-sm"></canvas>
-        <p class="font-label-md text-label-md text-on-surface">ยอดชำระ <span class="font-bold text-primary" id="pp-amount">฿0</span></p>
-        <p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-xs">สแกนแล้วกรุณาแจ้งพนักงานเพื่อยืนยันการชำระเงินอีกครั้ง ระบบยังไม่ตรวจสอบสลิปอัตโนมัติ</p>
+      <div id="promptpay-block" class="rounded-xl overflow-hidden border-2 border-primary-container/30 soft-shadow bg-gradient-to-b from-secondary-container/40 to-surface-container-lowest">
+        <!-- Brand header -->
+        <div class="flex items-center gap-sm px-lg pt-lg pb-md">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-on-primary font-headline-md text-headline-md flex-shrink-0">อ</div>
+          <div>
+            <div class="font-headline-md text-headline-md-mobile text-primary leading-tight">อิ่มใจ Cafe &amp; Kitchen</div>
+            <div class="font-label-sm text-label-sm text-on-surface-variant">อร่อยเหมือนกินที่บ้าน</div>
+          </div>
+        </div>
+        <!-- QR card -->
+        <div class="flex flex-col items-center gap-sm px-lg pb-lg">
+          <div class="inline-flex items-center gap-xs bg-primary-container/15 text-primary px-md py-xs rounded-full font-label-sm text-label-sm font-bold">
+            <span class="material-symbols-outlined !text-base">qr_code_2</span> พร้อมเพย์ PromptPay
+          </div>
+          <canvas id="ppQrCanvas" class="rounded-lg bg-white p-sm soft-shadow"></canvas>
+          <div class="flex items-center gap-xs font-label-md text-label-md text-on-surface-variant">
+            <span class="material-symbols-outlined !text-base text-primary">account_circle</span>
+            ชื่อบัญชี: นาย ชลทรัพย์ มัททวีวงศ์
+          </div>
+          <p class="font-label-md text-label-md text-on-surface">ยอดชำระ <span class="font-bold text-primary text-headline-md-mobile" id="pp-amount">฿0</span></p>
+          <p class="font-label-sm text-label-sm text-on-tertiary-container flex items-center gap-xs">
+            ขอบคุณที่อุดหนุนค่ะ
+            <span class="material-symbols-outlined !text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-xs">ยอดในนี้ตรงกับยอดคำสั่งซื้อของคุณอัตโนมัติ สแกนแล้วกรุณาแจ้งพนักงานเพื่อยืนยันการชำระเงินอีกครั้ง ระบบยังไม่ตรวจสอบสลิปอัตโนมัติ</p>
+          <label class="flex items-center gap-sm bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm mt-xs cursor-pointer w-full">
+            <input type="checkbox" id="pp-confirm-paid" class="w-4 h-4 accent-primary flex-shrink-0"/>
+            <span class="font-label-md text-label-md text-on-surface">ฉันโอนเงินผ่าน PromptPay เรียบร้อยแล้ว</span>
+          </label>
+        </div>
       </div>
 
       <p class="hidden font-label-sm text-label-sm text-error bg-error-container/40 rounded-lg px-md py-sm" id="checkout-error"></p>
@@ -184,11 +210,26 @@
 
   const payMethodRadios = document.querySelectorAll('input[name="payMethod"]');
   const promptpayBlock = document.getElementById('promptpay-block');
+  const paidCheckbox = document.getElementById('pp-confirm-paid');
+
+  function currentPayMethod() {
+    return document.querySelector('input[name="payMethod"]:checked').value;
+  }
+
+  function updateSubmitGate() {
+    const needsPaymentConfirm = currentPayMethod() === 'promptpay' && !paidCheckbox.checked;
+    submitBtn.disabled = needsPaymentConfirm;
+    submitBtn.classList.toggle('opacity-50', needsPaymentConfirm);
+    submitBtn.classList.toggle('cursor-not-allowed', needsPaymentConfirm);
+  }
+
   payMethodRadios.forEach((r) =>
     r.addEventListener('change', () => {
       promptpayBlock.classList.toggle('hidden', r.value !== 'promptpay' || !r.checked);
+      updateSubmitGate();
     })
   );
+  paidCheckbox.addEventListener('change', updateSubmitGate);
 
   function renderPromptPayQR(amount) {
     document.getElementById('pp-amount').textContent = fmtTHB(amount);
@@ -225,6 +266,7 @@
 
   const errorEl = document.getElementById('checkout-error');
   const submitBtn = document.getElementById('checkout-submit');
+  updateSubmitGate();
 
   document.getElementById('checkout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -238,6 +280,12 @@
     if (!customerName || !phone) return;
     if (orderType === 'delivery' && !address) {
       addressInput.focus();
+      return;
+    }
+    if (payMethod === 'promptpay' && !paidCheckbox.checked) {
+      errorEl.textContent = 'กรุณาโอนเงินผ่าน PromptPay แล้วติ๊กยืนยันก่อนสั่งซื้อ';
+      errorEl.classList.remove('hidden');
+      paidCheckbox.focus();
       return;
     }
 
