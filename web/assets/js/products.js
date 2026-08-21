@@ -11,7 +11,7 @@ const STORE = {
   phone: '02-123-4567',
   lineOA: '@imjaicafe',
   deliveryFeeNote: 'ฟรีค่าส่งเมื่อสั่งครบ 300 บาท / ต่ำกว่านั้นคิด 30 บาท',
-  promptpayId: '0000000000' // demo target — swap for the real PromptPay ID/phone before going live
+  promptpayId: '099-875-6879' // เบอร์พร้อมเพย์จริงของร้าน
 };
 
 const CATEGORIES = [
