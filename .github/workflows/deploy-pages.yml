@@ -3,8 +3,9 @@ name: Deploy web/ to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - claude/imjai-order-webapp
+      # GitHub Pages' auto-created "github-pages" deployment environment only allows
+      # deploys from the repo's default branch — keep this in sync if that changes.
+      - claude/imjai-n8n-customer-service-hgwcne
     paths:
       - "web/**"
       - ".github/workflows/deploy-pages.yml"
