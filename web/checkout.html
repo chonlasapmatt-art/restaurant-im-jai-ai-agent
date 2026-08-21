@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="light" lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ชำระเงิน — ImJai Cafe &amp; Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="assets/js/tailwind-config.js"></script>
+<link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col">
+
+<header class="full-width top-0 sticky backdrop-blur-md shadow-sm bg-surface/80 z-40">
+<div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
+<a href="index.html" class="font-headline-md text-headline-md font-bold text-primary">ImJai Cafe</a>
+<a href="menu.html" class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined !text-lg">arrow_back</span> กลับไปเลือกเมนู
+</a>
+</div>
+</header>
+
+<main class="flex-grow max-w-container-max mx-auto w-full px-lg py-lg page-enter">
+<h1 class="font-display-lg text-display-lg text-primary mb-lg text-center md:text-left">ยืนยันคำสั่งซื้อ</h1>
+
+<div id="empty-cart-notice" class="hidden bg-surface-container-lowest rounded-xl soft-shadow p-xl text-center max-w-lg mx-auto">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant opacity-50 mb-md">shopping_cart</span>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-md">ตะกร้าของคุณยังว่างอยู่</p>
+<a href="menu.html" class="inline-block bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full">ไปเลือกเมนู</a>
+</div>
+
+<div id="checkout-content" class="grid grid-cols-1 lg:grid-cols-5 gap-xl">
+  <!-- Order summary -->
+  <div class="lg:col-span-2 order-2 lg:order-1 reveal">
+    <div class="bg-surface-container-lowest rounded-xl soft-shadow p-lg border border-outline-variant/30 sticky top-24">
+      <h2 class="font-headline-md text-headline-md text-primary mb-md">สรุปรายการ</h2>
+      <ul class="flex flex-col gap-sm mb-md" id="summary-lines"></ul>
+      <div class="pt-sm border-t border-outline-variant/20 flex flex-col gap-xs">
+        <div class="flex justify-between items-center text-on-surface-variant font-label-md text-label-md">
+          <span>ยอดรวมสินค้า</span>
+          <span id="summary-subtotal">฿0</span>
+        </div>
+        <div class="flex justify-between items-center text-on-surface-variant font-label-md text-label-md" id="summary-delivery-row">
+          <span>ค่าจัดส่ง</span>
+          <span id="summary-delivery">฿0</span>
+        </div>
+        <div class="flex justify-between items-center text-primary font-headline-md text-headline-md-mobile mt-sm pt-sm border-t border-outline-variant/20 font-bold">
+          <span>รวมทั้งสิ้น</span>
+          <span id="summary-total">฿0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="lg:col-span-3 order-1 lg:order-2 reveal" style="--reveal-delay:100ms">
+    <form id="checkout-form" class="bg-surface-container-lowest rounded-xl soft-shadow p-lg border border-outline-variant/30 flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">ข้อมูลผู้สั่ง</h2>
+      <div>
+        <label class="block font-label-md text-label-md text-on-surface mb-xs" for="customerName">ชื่อ *</label>
+        <input class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors" id="customerName" required type="text" placeholder="ชื่อผู้สั่ง"/>
+      </div>
+      <div>
+        <label class="block font-label-md text-label-md text-on-surface mb-xs" for="phone">เบอร์โทร *</label>
+        <input class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors" id="phone" required type="tel" placeholder="08x-xxx-xxxx"/>
+      </div>
+
+      <div>
+        <span class="block font-label-md text-label-md text-on-surface mb-xs">รับอาหารแบบไหน *</span>
+        <div class="flex gap-sm">
+          <label class="flex-1 flex items-center gap-sm border border-outline-variant rounded-lg p-sm cursor-pointer transition-colors duration-200 has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
+            <input type="radio" name="orderType" value="pickup" checked/>
+            <span class="material-symbols-outlined !text-lg text-primary">storefront</span> รับที่ร้าน
+          </label>
+          <label class="flex-1 flex items-center gap-sm border border-outline-variant rounded-lg p-sm cursor-pointer transition-colors duration-200 has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
+            <input type="radio" name="orderType" value="delivery"/>
+            <span class="material-symbols-outlined !text-lg text-primary">local_shipping</span> จัดส่ง
+          </label>
+        </div>
+      </div>
+
+      <div class="hidden" id="delivery-address-field">
+        <label class="block font-label-md text-label-md text-on-surface mb-xs" for="address">ที่อยู่จัดส่ง *</label>
+        <textarea class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors resize-none" id="address" rows="2" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ"></textarea>
+        <p class="font-label-sm text-label-sm text-on-surface-variant mt-xs" id="delivery-fee-note"></p>
+      </div>
+
+      <div>
+        <label class="block font-label-md text-label-md text-on-surface mb-xs" for="note">หมายเหตุ (ถ้ามี)</label>
+        <textarea class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors resize-none" id="note" rows="2" placeholder="เช่น ไม่ใส่ผัก, หวานน้อย"></textarea>
+      </div>
+
+      <h2 class="font-headline-md text-headline-md text-primary mt-sm">วิธีชำระเงิน</h2>
+      <div class="flex flex-col gap-sm">
+        <label class="flex items-center gap-sm border border-outline-variant rounded-lg p-sm cursor-pointer transition-colors duration-200 has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
+          <input type="radio" name="payMethod" value="promptpay" checked/>
+          <span class="material-symbols-outlined !text-lg text-primary">qr_code_2</span> สแกนจ่าย PromptPay
+        </label>
+        <label class="flex items-center gap-sm border border-outline-variant rounded-lg p-sm cursor-pointer transition-colors duration-200 has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
+          <input type="radio" name="payMethod" value="cash"/>
+          <span class="material-symbols-outlined !text-lg text-primary">payments</span> จ่ายเงินสดตอนรับของ
+        </label>
+      </div>
+
+      <div id="promptpay-block" class="flex flex-col items-center gap-sm bg-surface-container-low rounded-lg p-lg">
+        <canvas id="ppQrCanvas" class="rounded-lg bg-white p-sm"></canvas>
+        <p class="font-label-md text-label-md text-on-surface">ยอดชำระ <span class="font-bold text-primary" id="pp-amount">฿0</span></p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-xs">QR นี้เป็นตัวอย่างสาธิต ยังไม่ผูกบัญชีร้านจริง กรุณาแจ้งพนักงานเพื่อยืนยันการชำระเงินอีกครั้ง</p>
+      </div>
+
+      <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover-lift mt-sm">ยืนยันสั่งซื้อ</button>
+      <p class="font-label-sm text-label-sm text-on-surface-variant text-center">ระบบนี้เป็นเว็บสาธิต ออเดอร์จะยังไม่ถูกส่งเข้าครัวจริง</p>
+    </form>
+  </div>
+</div>
+</main>
+
+<footer class="w-full mt-auto bg-secondary-container flex flex-col md:flex-row justify-between items-center px-lg py-xl max-w-container-max mx-auto font-label-sm text-label-sm">
+<div class="text-on-secondary-container">© 2026 ImJai Cafe &amp; Kitchen.</div>
+</footer>
+
+<script src="assets/js/products.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/qrcode.min.js"></script>
+<script src="assets/js/promptpay.js"></script>
+<script src="assets/js/orders.js"></script>
+<script src="assets/js/animations.js"></script>
+<script>
+  const lines = Cart.lines();
+  if (lines.length === 0) {
+    document.getElementById('checkout-content').classList.add('hidden');
+    document.getElementById('empty-cart-notice').classList.remove('hidden');
+  } else {
+    document.getElementById('summary-lines').innerHTML = lines
+      .map(
+        (l) => `<li class="flex justify-between items-center text-on-surface">
+          <span><span class="font-bold mr-2 text-primary">${l.qty}x</span>${l.product.name}</span>
+          <span>${fmtTHB(l.product.price * l.qty)}</span>
+        </li>`
+      )
+      .join('');
+    initReveal();
+  }
+
+  const orderTypeRadios = document.querySelectorAll('input[name="orderType"]');
+  const addressField = document.getElementById('delivery-address-field');
+  const addressInput = document.getElementById('address');
+  const deliveryFeeNote = document.getElementById('delivery-fee-note');
+  deliveryFeeNote.textContent = STORE.deliveryFeeNote;
+
+  function currentDeliveryFee() {
+    const isDelivery = document.querySelector('input[name="orderType"]:checked').value === 'delivery';
+    if (!isDelivery) return 0;
+    return Cart.subtotal() >= 300 ? 0 : 30;
+  }
+
+  function updateTotals() {
+    const subtotal = Cart.subtotal();
+    const deliveryFee = currentDeliveryFee();
+    const isDelivery = document.querySelector('input[name="orderType"]:checked').value === 'delivery';
+    document.getElementById('summary-subtotal').textContent = fmtTHB(subtotal);
+    document.getElementById('summary-delivery-row').classList.toggle('hidden', !isDelivery);
+    document.getElementById('summary-delivery').textContent = fmtTHB(deliveryFee);
+    document.getElementById('summary-total').textContent = fmtTHB(subtotal + deliveryFee);
+    renderPromptPayQR(subtotal + deliveryFee);
+  }
+
+  orderTypeRadios.forEach((r) =>
+    r.addEventListener('change', () => {
+      const isDelivery = r.value === 'delivery' && r.checked;
+      addressField.classList.toggle('hidden', !isDelivery);
+      addressInput.required = isDelivery;
+      updateTotals();
+    })
+  );
+
+  const payMethodRadios = document.querySelectorAll('input[name="payMethod"]');
+  const promptpayBlock = document.getElementById('promptpay-block');
+  payMethodRadios.forEach((r) =>
+    r.addEventListener('change', () => {
+      promptpayBlock.classList.toggle('hidden', r.value !== 'promptpay' || !r.checked);
+    })
+  );
+
+  function renderPromptPayQR(amount) {
+    document.getElementById('pp-amount').textContent = fmtTHB(amount);
+    if (amount <= 0) return;
+    try {
+      const payload = window.buildPromptPayPayload(STORE.promptpayId, amount);
+      const qr = qrcode(0, 'M');
+      qr.addData(payload);
+      qr.make();
+      const canvas = document.getElementById('ppQrCanvas');
+      const cellSize = 5, margin = 4;
+      const count = qr.getModuleCount();
+      const size = (count + margin * 2) * cellSize;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#361f1a';
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
+        }
+      }
+      canvas.classList.remove('qr-pop');
+      void canvas.offsetWidth;
+      canvas.classList.add('qr-pop');
+    } catch (e) {
+      /* best-effort — checkout still works without a rendered QR */
+    }
+  }
+
+  updateTotals();
+
+  document.getElementById('checkout-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const orderType = document.querySelector('input[name="orderType"]:checked').value;
+    const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
+    const customerName = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = addressInput.value.trim();
+    const noteInput = document.getElementById('note').value.trim();
+
+    if (!customerName || !phone) return;
+    if (orderType === 'delivery' && !address) {
+      addressInput.focus();
+      return;
+    }
+
+    const note = [orderType === 'delivery' ? `ส่งที่: ${address}` : '', `ชำระเงิน: ${payMethod === 'promptpay' ? 'PromptPay QR' : 'เงินสดตอนรับของ'}`, noteInput]
+      .filter(Boolean)
+      .join(' | ');
+
+    const total = Cart.subtotal() + currentDeliveryFee();
+    const order = createOrder({ customerName, phone, orderType, note, total });
+    window.location.href = `track.html?order=${encodeURIComponent(order.order_id)}`;
+  });
+</script>
+</body>
+</html>

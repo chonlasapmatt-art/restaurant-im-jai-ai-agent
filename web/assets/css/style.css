@@ -1,0 +1,218 @@
+body {
+  background-color: theme('colors.background');
+  color: theme('colors.on-background');
+}
+
+.soft-shadow {
+  box-shadow: 0 4px 20px rgba(78, 52, 46, 0.06);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(78, 52, 46, 0.1);
+}
+
+.pulse-border {
+  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(78, 52, 46, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(78, 52, 46, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(78, 52, 46, 0); }
+}
+
+/* Category placeholder art used instead of stock photography — this menu
+   isn't photographed yet, so cards get a warm gradient + icon rather than a
+   mismatched stock image. */
+.dish-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 60%), var(--dish-art-bg, #4e342e);
+}
+.dish-art .material-symbols-outlined {
+  font-size: 56px;
+  color: rgba(255, 255, 255, 0.92);
+}
+.dish-art[data-cat="coffee"]      { --dish-art-bg: linear-gradient(135deg, #4e342e, #2b1611); }
+.dish-art[data-cat="non-coffee"]  { --dish-art-bg: linear-gradient(135deg, #5e2d00, #3e1b00); }
+.dish-art[data-cat="food"]        { --dish-art-bg: linear-gradient(135deg, #6b5a3a, #3e1b00); }
+.dish-art[data-cat="dessert"]     { --dish-art-bg: linear-gradient(135deg, #755750, #4e342e); }
+
+/* Cart drawer */
+#cart-drawer, #mobile-drawer {
+  transition: transform 0.3s ease-in-out;
+}
+.backdrop {
+  transition: opacity 0.2s ease-in-out;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d4c3bf; border-radius: 9999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Motion: page load + scroll reveal + micro-interactions ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Whole-page entrance, applied to <main> on load */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes page-enter {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll-triggered reveal for sections/cards — .reveal starts hidden,
+   .is-visible plays the entrance once IntersectionObserver sees it (see animations.js) */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Buttons/links get a light tactile press */
+button, a.hover-lift {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+button:active {
+  transform: scale(0.96);
+}
+
+/* Dish art: gentle icon float + sheen sweep on hover */
+.dish-art .material-symbols-outlined {
+  transition: transform 0.3s ease;
+}
+.hover-lift:hover .dish-art .material-symbols-outlined {
+  transform: translateY(-4px) scale(1.05);
+}
+.dish-art {
+  position: relative;
+  overflow: hidden;
+}
+.dish-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+}
+.hover-lift:hover .dish-art::after {
+  transform: translateX(120%);
+}
+
+/* Rising steam wisps for the hero coffee icon */
+.steam {
+  position: absolute;
+  bottom: 100%;
+  width: 3px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.55);
+  animation: steam-rise 3s ease-in-out infinite;
+}
+@keyframes steam-rise {
+  0%   { height: 0; opacity: 0; transform: translateY(0) translateX(0); }
+  20%  { opacity: 0.6; }
+  100% { height: 26px; opacity: 0; transform: translateY(-30px) translateX(6px); }
+}
+
+/* Cart badge bounce when an item is added */
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.badge-pop {
+  animation: badge-pop 0.35s ease;
+}
+
+/* Toast notification */
+#toast-root {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+.toast {
+  background: #2f312f;
+  color: #f2f1ee;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: toast-in-out 2.2s ease forwards;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+@keyframes toast-in-out {
+  0%   { opacity: 0; transform: translateY(8px); }
+  12%  { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+
+/* Timeline progress bars animate their fill */
+#timeline-steps [style*="height"], #timeline-steps [style*="width"] {
+  transition: height 0.8s ease, width 0.8s ease;
+}
+
+/* Mobile sticky cart bar slides up instead of popping in */
+#mobile-cart-bar {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+#mobile-cart-bar.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  display: flex !important;
+  pointer-events: none;
+}
+
+/* QR code pops in once it's (re)drawn */
+@keyframes qr-pop {
+  0% { transform: scale(0.9); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.qr-pop {
+  animation: qr-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Floating chat widget: idle breathing */
+@keyframes chat-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+#chat-widget-link {
+  animation: chat-breathe 2.8s ease-in-out infinite;
+}
+#chat-widget-link:hover {
+  animation: none;
+}

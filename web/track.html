@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="light" lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ติดตามออเดอร์ — ImJai Cafe &amp; Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="assets/js/tailwind-config.js"></script>
+<link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col relative">
+
+<header class="bg-surface/80 backdrop-blur-md docked full-width top-0 sticky shadow-sm flex justify-between items-center w-full px-md md:px-lg max-w-container-max mx-auto h-16 z-40">
+<a href="index.html" class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+<span class="font-headline-md text-headline-md-mobile md:text-headline-md font-bold">ImJai Cafe &amp; Kitchen</span>
+</a>
+<nav class="hidden md:flex gap-lg font-label-md text-label-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="menu.html">เมนู</a>
+<a class="text-primary font-bold" href="track.html">ติดตามออเดอร์</a>
+</nav>
+</header>
+
+<main class="flex-grow w-full max-w-container-max mx-auto px-md md:px-lg py-lg flex flex-col items-center page-enter">
+
+  <!-- Lookup form (shown when no order is loaded) -->
+  <div id="lookup-panel" class="w-full max-w-md hidden">
+    <div class="text-center mb-lg">
+      <h1 class="font-display-lg text-display-lg text-primary mb-xs">ติดตามออเดอร์</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant">กรอกหมายเลขออเดอร์เพื่อดูสถานะ</p>
+    </div>
+    <form id="lookup-form" class="flex gap-sm mb-lg">
+      <input id="lookup-input" type="text" placeholder="เช่น ORD-20260821-103000" class="flex-grow bg-surface-container-lowest border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container"/>
+      <button type="submit" class="bg-primary text-on-primary px-lg rounded-lg font-label-md text-label-md">ค้นหา</button>
+    </form>
+    <div id="recent-orders"></div>
+  </div>
+
+  <!-- Tracking view -->
+  <div id="tracking-panel" class="hidden w-full">
+    <div class="text-center mb-lg w-full">
+      <h1 class="font-display-lg text-display-lg text-primary mb-xs">ติดตามออเดอร์ของคุณ</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant" id="order-id-label"></p>
+      <a href="track.html" class="font-label-sm text-label-sm text-primary underline">ค้นหาออเดอร์อื่น</a>
+    </div>
+
+    <div class="w-full max-w-3xl mx-auto flex flex-col gap-lg">
+      <!-- ETA Card -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(78,52,46,0.06)] p-lg flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-md border border-outline-variant/30">
+        <div class="flex flex-col">
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">เวลาโดยประมาณ</span>
+          <span class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary font-bold" id="eta-label"></span>
+        </div>
+        <div class="bg-surface-container-low p-md rounded-full">
+          <span class="material-symbols-outlined text-tertiary-container text-4xl">timer</span>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(78,52,46,0.06)] p-lg border border-outline-variant/30 reveal">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative gap-md md:gap-0" id="timeline-steps"></div>
+      </div>
+
+      <!-- Bento layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg">
+        <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(78,52,46,0.06)] p-lg border border-outline-variant/30 flex flex-col reveal" style="--reveal-delay:80ms">
+          <h3 class="font-headline-md text-headline-md text-primary mb-md pb-xs border-b border-outline-variant/20">สรุปรายการ</h3>
+          <ul class="flex flex-col gap-sm mb-md flex-grow" id="order-summary-lines"></ul>
+          <div class="pt-sm border-t border-outline-variant/20 flex flex-col gap-xs">
+            <div class="flex justify-between items-center text-primary font-headline-md text-headline-md-mobile font-bold">
+              <span>รวมทั้งสิ้น</span>
+              <span id="order-total"></span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-md md:gap-lg reveal" style="--reveal-delay:160ms">
+          <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(78,52,46,0.06)] p-lg border border-outline-variant/30">
+            <h3 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary mb-sm" id="fulfillment-title"></h3>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-on-surface-variant mt-1" id="fulfillment-icon">location_on</span>
+              <div class="flex flex-col">
+                <span class="font-body-md text-body-md font-bold text-on-surface" id="fulfillment-detail"></span>
+                <span class="font-body-md text-body-md text-on-surface-variant" id="order-note"></span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-secondary-container/50 rounded-xl p-lg border border-secondary-container flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-outlined text-4xl text-on-secondary-container mb-2">support_agent</span>
+            <h4 class="font-headline-md text-headline-md-mobile text-on-secondary-container mb-1">ต้องการความช่วยเหลือ?</h4>
+            <p class="font-body-md text-body-md text-on-secondary-container/80 mb-md">แชทกับน้องอิ่มใจได้เลย</p>
+            <a id="support-chat-link" target="_blank" rel="noopener" class="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full hover:shadow-lg transition-shadow duration-200">คุยกับแอดมิน</a>
+          </div>
+        </div>
+      </div>
+
+      <p class="font-label-sm text-label-sm text-on-surface-variant text-center">สถานะนี้เป็นการจำลองบนเบราว์เซอร์นี้เท่านั้น ยังไม่เชื่อมกับระบบร้านจริง</p>
+    </div>
+  </div>
+
+  <!-- Not found -->
+  <div id="not-found-panel" class="hidden text-center max-w-md">
+    <span class="material-symbols-outlined text-5xl text-on-surface-variant opacity-50 mb-md">search_off</span>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mb-md">ไม่พบออเดอร์นี้ในเบราว์เซอร์นี้</p>
+    <a href="track.html" class="text-primary underline">ลองค้นหาใหม่</a>
+  </div>
+</main>
+
+<a id="chat-widget-link" target="_blank" rel="noopener" class="fixed bottom-lg right-lg w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-on-primary hover:-translate-y-1 hover:shadow-xl transition-all duration-200 z-30" aria-label="แชทกับน้องอิ่มใจใน LINE">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">chat</span>
+</a>
+
+<script src="assets/js/products.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/orders.js"></script>
+<script src="assets/js/animations.js"></script>
+<script>
+  document.getElementById('chat-widget-link').href = 'https://line.me/R/ti/p/' + encodeURIComponent(STORE.lineOA);
+  document.getElementById('support-chat-link').href = 'https://line.me/R/ti/p/' + encodeURIComponent(STORE.lineOA);
+
+  function stepCircleHTML(step, state) {
+    const base = 'w-14 h-14 rounded-full flex items-center justify-center shadow-md';
+    if (state === 'done') return `<div class="${base} bg-primary text-on-primary"><span class="material-symbols-outlined">${step.icon}</span></div>`;
+    if (state === 'active') return `<div class="${base} bg-primary text-on-primary pulse-border"><span class="material-symbols-outlined">${step.icon}</span></div>`;
+    return `<div class="${base} bg-surface-container-high text-on-surface-variant border-2 border-surface-variant"><span class="material-symbols-outlined">${step.icon}</span></div>`;
+  }
+
+  function renderTimeline(order) {
+    const { stepIndex, steps } = trackOrder(order);
+    const pct = steps.length > 1 ? (stepIndex / (steps.length - 1)) * 100 : 0;
+
+    const stepsHTML = steps
+      .map((s, i) => {
+        const state = i < stepIndex ? 'done' : i === stepIndex ? 'active' : 'pending';
+        const dim = state === 'pending' ? 'opacity-60' : '';
+        return `<div class="flex flex-row md:flex-col items-center gap-md md:gap-xs relative z-10 w-full md:w-1/4">
+          ${stepCircleHTML(s, state)}
+          <div class="flex flex-col md:items-center ${dim}">
+            <span class="font-label-md text-label-md ${state === 'pending' ? 'text-on-surface-variant' : 'text-primary font-bold'}">${s.label}</span>
+          </div>
+        </div>`;
+      })
+      .join('');
+
+    document.getElementById('timeline-steps').innerHTML = `
+      <div class="absolute left-[27px] top-[28px] bottom-[28px] w-1 bg-surface-variant md:hidden"></div>
+      <div class="absolute left-[27px] top-[28px] w-1 bg-primary md:hidden" style="height:${pct}%"></div>
+      <div class="absolute top-[28px] left-[10%] right-[10%] h-1 bg-surface-variant hidden md:block z-0"></div>
+      <div class="absolute top-[28px] left-[10%] h-1 bg-primary hidden md:block z-0" style="width:${pct * 0.8}%"></div>
+      ${stepsHTML}`;
+
+    const done = stepIndex === steps.length - 1;
+    document.getElementById('eta-label').textContent = done ? 'จัดส่งเรียบร้อยแล้ว' : `พร้อมประมาณ ${order.eta} น.`;
+  }
+
+  function renderOrder(order) {
+    document.getElementById('order-id-label').textContent = `ออเดอร์ #${order.order_id}`;
+    document.getElementById('order-summary-lines').innerHTML = order.items_detail
+      .map((l) => `<li class="flex justify-between items-center text-on-surface">
+        <span><span class="font-bold mr-2 text-primary">${l.qty}x</span>${l.name}</span>
+        <span>${fmtTHB(l.price * l.qty)}</span>
+      </li>`)
+      .join('');
+    document.getElementById('order-total').textContent = fmtTHB(order.total);
+
+    const isDelivery = order.order_type === 'delivery';
+    document.getElementById('fulfillment-title').textContent = isDelivery ? 'ที่อยู่จัดส่ง' : 'จุดรับสินค้า';
+    document.getElementById('fulfillment-icon').textContent = isDelivery ? 'local_shipping' : 'storefront';
+    document.getElementById('fulfillment-detail').textContent = isDelivery ? order.customer_name : STORE.name;
+    document.getElementById('order-note').textContent = isDelivery ? order.phone : STORE.address;
+
+    renderTimeline(order);
+  }
+
+  function showPanel(id) {
+    ['lookup-panel', 'tracking-panel', 'not-found-panel'].forEach((p) => document.getElementById(p).classList.toggle('hidden', p !== id));
+  }
+
+  function renderRecentOrders() {
+    const orders = getAllOrders();
+    const el = document.getElementById('recent-orders');
+    if (orders.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = `<p class="font-label-md text-label-md text-on-surface-variant mb-sm">ออเดอร์ล่าสุดในเบราว์เซอร์นี้</p>` +
+      orders.slice(0, 5).map((o) => `<a href="track.html?order=${encodeURIComponent(o.order_id)}" class="block bg-surface-container-lowest rounded-lg p-md mb-sm soft-shadow hover:bg-surface-container-low transition-colors">
+        <div class="flex justify-between font-label-md text-label-md text-on-surface"><span>${o.order_id}</span><span class="text-primary">${fmtTHB(o.total)}</span></div>
+        <div class="font-label-sm text-label-sm text-on-surface-variant">${o.created_at}</div>
+      </a>`).join('');
+  }
+
+  let pollTimer = null;
+  function loadFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order');
+    if (!orderId) {
+      showPanel('lookup-panel');
+      renderRecentOrders();
+      return;
+    }
+    const order = getOrder(orderId);
+    if (!order) {
+      showPanel('not-found-panel');
+      return;
+    }
+    showPanel('tracking-panel');
+    renderOrder(order);
+    initReveal();
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(() => renderOrder(order), 15000);
+  }
+
+  document.getElementById('lookup-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('lookup-input').value.trim();
+    if (!id) return;
+    window.location.href = `track.html?order=${encodeURIComponent(id)}`;
+  });
+
+  loadFromQuery();
+</script>
+</body>
+</html>

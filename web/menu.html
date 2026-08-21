@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="light" lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>เมนู — ImJai Cafe &amp; Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="assets/js/tailwind-config.js"></script>
+<link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col pb-24 md:pb-0">
+
+<!-- TopNavBar -->
+<header class="full-width top-0 sticky backdrop-blur-md shadow-sm bg-surface/80 z-40">
+<div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
+<a href="index.html" class="font-headline-md text-headline-md font-bold text-primary">ImJai Cafe</a>
+<nav class="hidden md:flex gap-lg">
+<a class="text-primary font-bold" href="menu.html">เมนู</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="track.html">ติดตามออเดอร์</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="index.html#about">เกี่ยวกับร้าน</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="index.html#location">ที่ตั้ง</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="relative text-primary hover:text-primary/80 transition-colors duration-200 active:scale-95 transition-transform" data-cart-toggle aria-label="ตะกร้าสินค้า">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="hidden absolute -top-1 -right-1 bg-tertiary-container text-on-tertiary text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" data-cart-badge>0</span>
+</button>
+<button class="md:hidden text-primary" data-mobile-menu-toggle aria-label="เมนู">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+
+<!-- Mobile nav drawer -->
+<div class="fixed inset-0 bg-black/30 z-40 hidden" id="mobile-backdrop"></div>
+<div class="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-surface shadow-xl z-50 translate-x-full flex flex-col h-full p-lg overflow-y-auto" id="mobile-drawer">
+<div class="flex justify-between items-center mb-lg">
+<div class="font-headline-md text-headline-md text-primary">ImJai Cafe</div>
+<button class="text-primary" data-mobile-menu-close aria-label="ปิดเมนู">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-sm flex-1 font-label-md text-label-md">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="index.html">
+<span class="material-symbols-outlined">home</span> หน้าแรก
+</a>
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm" href="menu.html">
+<span class="material-symbols-outlined">restaurant_menu</span> เมนูทั้งหมด
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="track.html">
+<span class="material-symbols-outlined">receipt_long</span> ติดตามออเดอร์
+</a>
+</nav>
+</div>
+
+<!-- Cart slide-over drawer -->
+<div class="fixed inset-0 bg-black/30 z-40 hidden" id="cart-backdrop"></div>
+<div class="fixed inset-y-0 right-0 w-96 max-w-[90vw] bg-surface shadow-xl z-50 translate-x-full flex flex-col h-full" id="cart-drawer">
+<div class="flex justify-between items-center px-lg py-md border-b border-outline-variant/30">
+<div class="font-headline-md text-headline-md text-primary">ตะกร้าของคุณ</div>
+<button class="text-primary" data-cart-close aria-label="ปิดตะกร้า">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto px-lg" id="cart-drawer-body"></div>
+<div class="hidden border-t border-outline-variant/30 p-lg" id="cart-drawer-footer">
+<div class="flex justify-between items-center mb-md font-headline-md text-headline-md-mobile">
+<span class="text-on-surface">รวม</span>
+<span class="text-primary" data-cart-total>฿0</span>
+</div>
+<a href="checkout.html" class="block text-center bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover-lift">ไปชำระเงิน</a>
+</div>
+</div>
+
+<main class="flex-grow max-w-container-max mx-auto w-full px-lg py-lg page-enter">
+<div class="text-center mb-lg">
+<h1 class="font-display-lg text-display-lg text-primary mb-xs">เมนูของเรา</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">เลือกเมนูที่ใช่ แล้วกดสั่งได้เลย</p>
+</div>
+
+<!-- Category filter tabs -->
+<div class="flex gap-sm overflow-x-auto pb-md mb-lg" id="category-tabs">
+<button class="px-lg py-sm rounded-full font-label-md text-label-md whitespace-nowrap transition-colors bg-primary text-on-primary" data-filter="all">ทั้งหมด</button>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg" id="menu-grid"></div>
+</main>
+
+<!-- Footer -->
+<footer class="w-full mt-auto bg-secondary-container flex flex-col md:flex-row justify-between items-center px-lg py-xl max-w-container-max mx-auto font-label-sm text-label-sm">
+<div class="text-on-secondary-container mb-md md:mb-0">© 2026 ImJai Cafe &amp; Kitchen. Home-Cooked Professionalism.</div>
+<nav class="flex gap-md flex-wrap justify-center">
+<a class="text-on-secondary-container hover:underline" href="index.html#location">ที่ตั้ง</a>
+</nav>
+</footer>
+
+<!-- Mobile sticky cart bar -->
+<div class="md:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-outline-variant/40 p-md z-30 hidden" id="mobile-cart-bar">
+<button data-cart-toggle class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-full flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span data-mobile-cart-summary></span>
+</button>
+</div>
+
+<script src="assets/js/products.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/animations.js"></script>
+<script>
+  function productCardHTML(p) {
+    const unavailable = !p.is_available;
+    return `
+    <article class="bg-surface-container-lowest rounded-xl overflow-hidden soft-shadow hover-lift flex flex-col ${unavailable ? 'opacity-60' : ''}">
+      <div class="relative h-48 overflow-hidden dish-art" data-cat="${p.category}">
+        <span class="material-symbols-outlined">${productIcon(p)}</span>
+        ${p.promotion ? '<div class="absolute top-sm right-sm bg-tertiary-container text-on-tertiary px-sm py-xs rounded-full font-label-sm text-label-sm">Chef\'s Choice</div>' : ''}
+        ${unavailable ? '<div class="absolute inset-0 bg-inverse-surface/60 flex items-center justify-center"><span class="bg-surface-container-highest/90 text-on-surface px-md py-xs rounded-full font-label-sm text-label-sm">หมดวันนี้</span></div>' : ''}
+      </div>
+      <div class="p-md flex flex-col flex-grow">
+        <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">${categoryLabel(p.category)}</div>
+        <h3 class="font-headline-md text-headline-md-mobile text-on-surface mb-xs">${p.name}</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-md flex-grow">${p.description}</p>
+        ${p.allergens && p.allergens !== '-' ? `<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">สารก่อภูมิแพ้: ${p.allergens}</p>` : ''}
+        ${p.note ? `<p class="font-label-sm text-label-sm text-on-tertiary-container bg-tertiary-container/10 rounded-md px-sm py-xs mb-md">${p.note}</p>` : ''}
+        <div class="flex justify-between items-center mt-auto">
+          <span class="font-headline-md text-headline-md text-primary">${fmtTHB(p.price)}</span>
+          <button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-md text-label-md flex items-center gap-xs hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed" data-add="${p.sku}" ${unavailable ? 'disabled' : ''}>
+            <span class="material-symbols-outlined !text-lg">add_shopping_cart</span> เพิ่ม
+          </button>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderMenu(filter) {
+    const items = filter === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.category === filter);
+    document.getElementById('menu-grid').innerHTML = items.map(productCardHTML).join('');
+    staggerReveal(document.querySelectorAll('#menu-grid > article'));
+    initReveal();
+    document.querySelectorAll('[data-add]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const p = findProduct(btn.dataset.add);
+        Cart.add(p.sku, 1);
+        bounceCartBadge();
+        showToast(`เพิ่ม "${p.name}" แล้ว`, 'add_shopping_cart');
+      });
+    });
+  }
+
+  const tabsEl = document.getElementById('category-tabs');
+  CATEGORIES.forEach((c) => {
+    const btn = document.createElement('button');
+    btn.className = 'px-lg py-sm rounded-full font-label-md text-label-md whitespace-nowrap transition-colors bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest';
+    btn.dataset.filter = c.id;
+    btn.textContent = c.label;
+    tabsEl.appendChild(btn);
+  });
+
+  tabsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-filter]');
+    if (!btn) return;
+    tabsEl.querySelectorAll('button').forEach((b) => b.className = 'px-lg py-sm rounded-full font-label-md text-label-md whitespace-nowrap transition-colors bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest');
+    btn.className = 'px-lg py-sm rounded-full font-label-md text-label-md whitespace-nowrap transition-colors bg-primary text-on-primary';
+    renderMenu(btn.dataset.filter);
+  });
+
+  function updateMobileCartBar() {
+    const bar = document.getElementById('mobile-cart-bar');
+    const count = Cart.count();
+    bar.classList.toggle('hidden', count === 0);
+    const summary = document.querySelector('[data-mobile-cart-summary]');
+    if (summary) summary.textContent = `ดูตะกร้า (${count}) — ${fmtTHB(Cart.subtotal())}`;
+  }
+  document.addEventListener('cart:change', updateMobileCartBar);
+  updateMobileCartBar();
+
+  renderMenu('all');
+</script>
+</body>
+</html>

@@ -22,7 +22,7 @@
         │  1. อ่าน Google Sheets        │
         │     ├─ StoreProfile  → ข้อมูลร้าน 18 แถว
         │     ├─ KnowledgeBase → FAQ 15 ข้อ
-        │     ├─ Products      → เมนู 17 รายการ
+        │     ├─ Products      → เมนู 16 รายการ
         │     ├─ Orders        → ออเดอร์ของลูกค้าคนนี้
         │     └─ AIMemory      → คำตอบที่ทีมงานยืนยันแล้ว
         │              │                │
@@ -57,7 +57,7 @@
 |---|---|---|
 | **StoreProfile** | key, value | ข้อมูลร้าน เวลาทำการ ที่ตั้ง นโยบาย (18 แถว) |
 | **KnowledgeBase** | id, category, question, answer, tags | FAQ 15 ข้อ |
-| **Products** | sku, name, category, price, description, allergens, is_available, promotion | เมนู 17 รายการ |
+| **Products** | sku, name, category, price, description, allergens, is_available, promotion | เมนู 16 รายการ |
 
 **ข้อมูลที่ระบบใช้งานอัตโนมัติ**
 
