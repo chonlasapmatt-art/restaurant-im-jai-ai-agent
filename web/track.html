@@ -17,20 +17,47 @@
 <span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
 <span class="font-headline-md text-headline-md-mobile md:text-headline-md font-bold">ImJai Cafe &amp; Kitchen</span>
 </a>
-<nav class="hidden md:flex gap-lg font-label-md text-label-md">
+<nav class="hidden md:flex gap-lg font-label-md text-label-md items-center">
 <a class="text-on-surface-variant hover:text-primary transition-colors" href="menu.html">เมนู</a>
 <a class="text-primary font-bold" href="track.html">ติดตามออเดอร์</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="contact.html">ติดต่อเรา</a>
+<div data-auth-slot></div>
 </nav>
 </header>
 
 <main class="flex-grow w-full max-w-container-max mx-auto px-md md:px-lg py-lg flex flex-col items-center page-enter">
 
   <!-- Lookup form (shown when no order is loaded) -->
-  <div id="lookup-panel" class="w-full max-w-md hidden">
+  <div id="lookup-panel" class="w-full max-w-2xl hidden">
     <div class="text-center mb-lg">
       <h1 class="font-display-lg text-display-lg text-primary mb-xs">ติดตามออเดอร์</h1>
       <p class="font-body-lg text-body-lg text-on-surface-variant">กรอกหมายเลขออเดอร์เพื่อดูสถานะ</p>
     </div>
+
+    <!-- My Orders — shown only when signed in with LINE (see assets/js/auth.js) -->
+    <div id="my-orders-section" class="hidden mb-xl">
+      <div class="flex items-center justify-between mb-sm">
+        <h2 class="font-headline-md text-headline-md text-primary">ออเดอร์ของฉัน</h2>
+        <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+          <span class="w-2 h-2 rounded-full bg-tertiary-container" style="animation: pulse-ring 2s infinite;"></span>
+          อัปเดตอัตโนมัติ
+        </span>
+      </div>
+      <div id="my-orders-list" class="flex flex-col gap-sm"></div>
+      <p id="my-orders-empty" class="hidden font-body-md text-body-md text-on-surface-variant text-center py-lg">ยังไม่มีออเดอร์ในบัญชีนี้</p>
+      <button id="my-orders-logout" class="block mt-sm font-label-sm text-label-sm text-on-surface-variant underline">ออกจากระบบ</button>
+    </div>
+    <div id="my-orders-signin-hint" class="hidden bg-surface-container-lowest rounded-xl soft-shadow p-lg text-center mb-xl">
+      <p class="font-body-md text-body-md text-on-surface-variant mb-md">เข้าสู่ระบบด้วย LINE เพื่อดูออเดอร์ทั้งหมดของคุณแบบเรียลไทม์</p>
+      <div class="flex justify-center" data-auth-slot></div>
+    </div>
+
+    <div class="flex items-center gap-sm mb-md" id="lookup-divider" style="display:none;">
+      <div class="flex-grow h-px bg-outline-variant/40"></div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">หรือค้นหาด้วยเลขออเดอร์</span>
+      <div class="flex-grow h-px bg-outline-variant/40"></div>
+    </div>
+
     <form id="lookup-form" class="flex gap-sm mb-lg">
       <input id="lookup-input" type="text" placeholder="เช่น ORD-20260821-103000" class="flex-grow bg-surface-container-lowest border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container"/>
       <button type="submit" class="bg-primary text-on-primary px-lg rounded-lg font-label-md text-label-md">ค้นหา</button>
@@ -114,6 +141,7 @@
 <script src="assets/js/products.js"></script>
 <script src="assets/js/cart.js"></script>
 <script src="assets/js/orders.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/animations.js"></script>
 <script>
   document.getElementById('chat-widget-link').href = 'https://line.me/R/ti/p/' + encodeURIComponent(STORE.lineOA);
@@ -157,11 +185,13 @@
   function renderOrder(order) {
     document.getElementById('order-id-label').textContent = `ออเดอร์ #${order.order_id}`;
     document.getElementById('order-summary-lines').innerHTML = order.items_detail
-      .map((l) => `<li class="flex justify-between items-center text-on-surface">
-        <span><span class="font-bold mr-2 text-primary">${l.qty}x</span>${l.name}</span>
-        <span>${fmtTHB(l.price * l.qty)}</span>
-      </li>`)
-      .join('');
+      ? order.items_detail
+          .map((l) => `<li class="flex justify-between items-center text-on-surface">
+            <span><span class="font-bold mr-2 text-primary">${l.qty}x</span>${l.name}</span>
+            <span>${fmtTHB(l.price * l.qty)}</span>
+          </li>`)
+          .join('')
+      : `<li class="text-on-surface">${order.items || ''}</li>`;
     document.getElementById('order-total').textContent = fmtTHB(order.total);
 
     const isDelivery = order.order_type === 'delivery';
@@ -188,16 +218,78 @@
       </a>`).join('');
   }
 
+  async function fetchMyOrders() {
+    const profile = getProfile();
+    if (!profile || !MY_ORDERS_API_URL) return null;
+    try {
+      const res = await fetch(`${MY_ORDERS_API_URL}?line_user_id=${encodeURIComponent(profile.userId)}`);
+      const data = await res.json();
+      if (!res.ok || data.result !== 'ok') return null;
+      return data.orders || [];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function renderMyOrdersList(orders) {
+    const list = document.getElementById('my-orders-list');
+    const empty = document.getElementById('my-orders-empty');
+    if (!orders || orders.length === 0) {
+      list.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    list.innerHTML = orders.map((o) => `
+      <a href="track.html?order=${encodeURIComponent(o.order_id)}" class="flex justify-between items-center bg-surface-container-lowest rounded-lg p-md soft-shadow hover:bg-surface-container-low transition-colors">
+        <div>
+          <div class="font-label-md text-label-md text-on-surface">${o.order_id}</div>
+          <div class="font-label-sm text-label-sm text-on-surface-variant">${o.created_at || ''} · ${o.status || ''}</div>
+        </div>
+        <span class="text-primary font-headline-md text-headline-md-mobile">${fmtTHB(o.total || 0)}</span>
+      </a>`).join('');
+  }
+
+  let myOrdersPollTimer = null;
+  async function initMyOrdersSection() {
+    const signinHint = document.getElementById('my-orders-signin-hint');
+    const section = document.getElementById('my-orders-section');
+    const divider = document.getElementById('lookup-divider');
+    if (myOrdersPollTimer) { clearInterval(myOrdersPollTimer); myOrdersPollTimer = null; }
+
+    if (!LIFF_ID) {
+      signinHint.classList.add('hidden');
+      section.classList.add('hidden');
+      divider.style.display = 'none';
+      return;
+    }
+    divider.style.display = 'flex';
+
+    if (!isLoggedIn()) {
+      signinHint.classList.remove('hidden');
+      section.classList.add('hidden');
+      return;
+    }
+    signinHint.classList.add('hidden');
+    section.classList.remove('hidden');
+
+    const refresh = async () => renderMyOrdersList(await fetchMyOrders());
+    await refresh();
+    myOrdersPollTimer = setInterval(refresh, 10000);
+  }
+
   let pollTimer = null;
-  function loadFromQuery() {
+  async function loadFromQuery() {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
+    if (pollTimer) clearInterval(pollTimer);
     if (!orderId) {
       showPanel('lookup-panel');
       renderRecentOrders();
+      initMyOrdersSection();
       return;
     }
-    const order = getOrder(orderId);
+    const order = await resolveOrder(orderId);
     if (!order) {
       showPanel('not-found-panel');
       return;
@@ -205,9 +297,20 @@
     showPanel('tracking-panel');
     renderOrder(order);
     initReveal();
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(() => renderOrder(order), 15000);
+    pollTimer = setInterval(async () => {
+      const fresh = await resolveOrder(orderId);
+      if (fresh) renderOrder(fresh);
+    }, 15000);
   }
+
+  document.addEventListener('auth:ready', () => {
+    const lookupPanel = document.getElementById('lookup-panel');
+    if (lookupPanel && !lookupPanel.classList.contains('hidden')) initMyOrdersSection();
+  });
+
+  document.getElementById('my-orders-logout').addEventListener('click', () => {
+    if (confirm('ออกจากระบบ?')) logoutOfLine();
+  });
 
   document.getElementById('lookup-form').addEventListener('submit', (e) => {
     e.preventDefault();

@@ -20,10 +20,12 @@
 <nav class="hidden md:flex gap-lg">
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="menu.html">เมนู</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="track.html">ติดตามออเดอร์</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="contact.html">ติดต่อเรา</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#about">เกี่ยวกับร้าน</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#location">ที่ตั้ง</a>
 </nav>
 <div class="flex items-center gap-md">
+<div data-auth-slot></div>
 <button class="relative text-primary hover:text-primary/80 transition-colors duration-200 active:scale-95 transition-transform" data-cart-toggle aria-label="ตะกร้าสินค้า">
 <span class="material-symbols-outlined">shopping_cart</span>
 <span class="hidden absolute -top-1 -right-1 bg-tertiary-container text-on-tertiary text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" data-cart-badge>0</span>
@@ -53,6 +55,9 @@
 </a>
 <a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="track.html">
 <span class="material-symbols-outlined">receipt_long</span> ติดตามออเดอร์
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="contact.html">
+<span class="material-symbols-outlined">mail</span> ติดต่อเรา
 </a>
 <a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#location">
 <span class="material-symbols-outlined">location_on</span> ที่ตั้งร้าน
@@ -152,6 +157,7 @@
 <nav class="flex gap-md flex-wrap justify-center">
 <a class="text-on-secondary-container hover:underline" href="menu.html">เมนู</a>
 <a class="text-on-secondary-container hover:underline" href="track.html">ติดตามออเดอร์</a>
+<a class="text-on-secondary-container hover:underline" href="contact.html">ติดต่อเรา</a>
 <a class="text-on-secondary-container hover:underline" href="#location">ที่ตั้ง</a>
 </nav>
 </footer>
@@ -164,6 +170,7 @@
 <script src="assets/js/products.js"></script>
 <script src="assets/js/cart.js"></script>
 <script src="assets/js/nav.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/animations.js"></script>
 <script>
   document.getElementById('store-address').textContent = STORE.address;

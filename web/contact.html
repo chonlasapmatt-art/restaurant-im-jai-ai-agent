@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="light" lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ติดต่อเรา — ImJai Cafe &amp; Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="assets/js/tailwind-config.js"></script>
+<link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col">
+
+<!-- TopNavBar -->
+<header class="full-width top-0 sticky backdrop-blur-md shadow-sm bg-surface/80 z-40">
+<div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
+<a href="index.html" class="font-headline-md text-headline-md font-bold text-primary">ImJai Cafe</a>
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="menu.html">เมนู</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="track.html">ติดตามออเดอร์</a>
+<a class="text-primary font-bold" href="contact.html">ติดต่อเรา</a>
+</nav>
+<div class="flex items-center gap-md">
+<div data-auth-slot></div>
+<button class="relative text-primary hover:text-primary/80 transition-colors duration-200 active:scale-95 transition-transform" data-cart-toggle aria-label="ตะกร้าสินค้า">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="hidden absolute -top-1 -right-1 bg-tertiary-container text-on-tertiary text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" data-cart-badge>0</span>
+</button>
+<button class="md:hidden text-primary" data-mobile-menu-toggle aria-label="เมนู">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+
+<!-- Mobile nav drawer -->
+<div class="fixed inset-0 bg-black/30 z-40 hidden" id="mobile-backdrop"></div>
+<div class="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-surface shadow-xl z-50 translate-x-full flex flex-col h-full p-lg overflow-y-auto" id="mobile-drawer">
+<div class="flex justify-between items-center mb-lg">
+<div class="font-headline-md text-headline-md text-primary">ImJai Cafe</div>
+<button class="text-primary" data-mobile-menu-close aria-label="ปิดเมนู">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-sm flex-1 font-label-md text-label-md">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="index.html">
+<span class="material-symbols-outlined">home</span> หน้าแรก
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="menu.html">
+<span class="material-symbols-outlined">restaurant_menu</span> เมนูทั้งหมด
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="track.html">
+<span class="material-symbols-outlined">receipt_long</span> ติดตามออเดอร์
+</a>
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm" href="contact.html">
+<span class="material-symbols-outlined">mail</span> ติดต่อเรา
+</a>
+</nav>
+</div>
+
+<!-- Cart slide-over drawer -->
+<div class="fixed inset-0 bg-black/30 z-40 hidden" id="cart-backdrop"></div>
+<div class="fixed inset-y-0 right-0 w-96 max-w-[90vw] bg-surface shadow-xl z-50 translate-x-full flex flex-col h-full" id="cart-drawer">
+<div class="flex justify-between items-center px-lg py-md border-b border-outline-variant/30">
+<div class="font-headline-md text-headline-md text-primary">ตะกร้าของคุณ</div>
+<button class="text-primary" data-cart-close aria-label="ปิดตะกร้า">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto px-lg" id="cart-drawer-body"></div>
+<div class="hidden border-t border-outline-variant/30 p-lg" id="cart-drawer-footer">
+<div class="flex justify-between items-center mb-md font-headline-md text-headline-md-mobile">
+<span class="text-on-surface">รวม</span>
+<span class="text-primary" data-cart-total>฿0</span>
+</div>
+<a href="checkout.html" class="block text-center bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover-lift">ไปชำระเงิน</a>
+</div>
+</div>
+
+<main class="flex-grow max-w-container-max mx-auto w-full px-lg py-lg page-enter">
+<div class="text-center mb-xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-xs">ติดต่อเรา</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">มีคำถามหรือต้องการความช่วยเหลือ ทักมาได้เลย</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl max-w-4xl mx-auto items-start">
+<!-- Contact form -->
+<form class="bg-surface-container-lowest rounded-xl soft-shadow p-lg border border-outline-variant/30 flex flex-col gap-md reveal" id="contact-form">
+<h2 class="font-headline-md text-headline-md text-primary mb-xs">ส่งข้อความถึงร้าน</h2>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="ct-name">ชื่อ *</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors" id="ct-name" required type="text" placeholder="ชื่อของคุณ"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="ct-contact">อีเมลหรือเบอร์โทรติดต่อกลับ *</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors" id="ct-contact" required type="text" placeholder="your@email.com หรือ 08x-xxx-xxxx"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="ct-message">ข้อความ *</label>
+<textarea class="w-full bg-surface-bright border border-outline-variant rounded-lg p-sm focus:border-tertiary-container focus:ring-1 focus:ring-tertiary-container transition-colors resize-none" id="ct-message" required rows="5" placeholder="สอบถาม/แจ้งปัญหา/ข้อเสนอแนะ"></textarea>
+</div>
+<p class="hidden font-label-sm text-label-sm text-error bg-error-container/40 rounded-lg px-md py-sm" id="contact-error"></p>
+<p class="hidden font-label-sm text-label-sm text-on-tertiary-container bg-tertiary-container/10 rounded-lg px-md py-sm" id="contact-success">ส่งข้อความแล้ว ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ</p>
+<button type="submit" class="bg-primary text-on-primary font-label-md text-label-md py-md rounded-lg hover:bg-primary/90 transition-colors mt-sm" id="contact-submit">
+<span id="contact-submit-label">ส่งข้อความ</span>
+</button>
+<p class="hidden font-label-sm text-label-sm text-on-surface-variant text-center" id="contact-not-configured">
+ฟอร์มนี้ยังไม่ได้ต่อระบบรับข้อความ — ทักแชทผ่าน LINE ด้านล่างแทนได้เลยค่ะ
+</p>
+</form>
+
+<!-- Store info -->
+<div class="flex flex-col gap-lg reveal" style="--reveal-delay:100ms">
+<div class="bg-surface-container-lowest rounded-xl soft-shadow p-lg border border-outline-variant/30">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">ช่องทางติดต่อ</h2>
+<ul class="flex flex-col gap-md font-body-md text-body-md text-on-surface">
+<li class="flex items-start gap-sm"><span class="material-symbols-outlined text-primary">location_on</span><span id="store-address"></span></li>
+<li class="flex items-start gap-sm"><span class="material-symbols-outlined text-primary">schedule</span><span id="store-hours"></span></li>
+<li class="flex items-start gap-sm"><span class="material-symbols-outlined text-primary">call</span><span id="store-phone"></span></li>
+</ul>
+<a id="line-oa-link" target="_blank" rel="noopener" class="inline-flex items-center gap-sm mt-lg bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full hover-lift">
+<span class="material-symbols-outlined !text-lg">chat</span> แชทกับน้องอิ่มใจใน LINE
+</a>
+</div>
+<div class="rounded-xl overflow-hidden soft-shadow border border-outline-variant/30 relative h-56 bg-gradient-to-br from-primary-container to-tertiary-container flex items-center justify-center">
+<a id="store-maps-link" target="_blank" rel="noopener" class="flex flex-col items-center gap-xs text-on-primary hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined !text-4xl">map</span>
+<span class="font-label-md text-label-md">เปิดแผนที่ร้านใน Google Maps</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+
+<footer class="w-full mt-auto bg-secondary-container flex flex-col md:flex-row justify-between items-center px-lg py-xl max-w-container-max mx-auto font-label-sm text-label-sm">
+<div class="text-on-secondary-container">© 2026 ImJai Cafe &amp; Kitchen. Home-Cooked Professionalism.</div>
+<nav class="flex gap-md flex-wrap justify-center">
+<a class="text-on-secondary-container hover:underline" href="menu.html">เมนู</a>
+<a class="text-on-secondary-container hover:underline" href="track.html">ติดตามออเดอร์</a>
+</nav>
+</footer>
+
+<script src="assets/js/products.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/animations.js"></script>
+<script>
+  // ⚙️ วาง Production URL ของ webhook "imjai-contact" จาก workflow/imjai-order-webapp-api.json
+  const CONTACT_API_URL = ''; // เช่น 'https://your-n8n.example.com/webhook/imjai-contact'
+
+  document.getElementById('store-address').textContent = STORE.address;
+  document.getElementById('store-hours').textContent = STORE.hours;
+  document.getElementById('store-phone').textContent = STORE.phone + ' · LINE ' + STORE.lineOA;
+  document.getElementById('store-maps-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(STORE.address);
+  document.getElementById('line-oa-link').href = 'https://line.me/R/ti/p/' + encodeURIComponent(STORE.lineOA);
+
+  if (!CONTACT_API_URL) {
+    document.getElementById('contact-not-configured').classList.remove('hidden');
+  }
+
+  const errorEl = document.getElementById('contact-error');
+  const successEl = document.getElementById('contact-success');
+  const submitBtn = document.getElementById('contact-submit');
+  const submitLabel = document.getElementById('contact-submit-label');
+
+  document.getElementById('contact-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+
+    if (!CONTACT_API_URL) {
+      errorEl.textContent = 'ฟอร์มนี้ยังไม่ได้ต่อระบบรับข้อความ กรุณาแชทผ่าน LINE แทน';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    const name = document.getElementById('ct-name').value.trim();
+    const contact = document.getElementById('ct-contact').value.trim();
+    const message = document.getElementById('ct-message').value.trim();
+    if (!name || !contact || !message) return;
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = 'กำลังส่ง...';
+    try {
+      const res = await fetch(CONTACT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, contact, message })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.result !== 'ok') throw new Error(data.message || 'ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      successEl.classList.remove('hidden');
+      document.getElementById('contact-form').reset();
+    } catch (err) {
+      errorEl.textContent = err.message || 'ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+      errorEl.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'ส่งข้อความ';
+    }
+  });
+
+  initReveal();
+</script>
+</body>
+</html>

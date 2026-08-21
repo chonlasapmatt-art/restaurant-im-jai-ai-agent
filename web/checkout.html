@@ -109,7 +109,8 @@
         <p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-xs">QR นี้เป็นตัวอย่างสาธิต ยังไม่ผูกบัญชีร้านจริง กรุณาแจ้งพนักงานเพื่อยืนยันการชำระเงินอีกครั้ง</p>
       </div>
 
-      <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover-lift mt-sm">ยืนยันสั่งซื้อ</button>
+      <p class="hidden font-label-sm text-label-sm text-error bg-error-container/40 rounded-lg px-md py-sm" id="checkout-error"></p>
+      <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover-lift mt-sm" id="checkout-submit">ยืนยันสั่งซื้อ</button>
       <p class="font-label-sm text-label-sm text-on-surface-variant text-center">ระบบนี้เป็นเว็บสาธิต ออเดอร์จะยังไม่ถูกส่งเข้าครัวจริง</p>
     </form>
   </div>
@@ -125,8 +126,14 @@
 <script src="assets/js/qrcode.min.js"></script>
 <script src="assets/js/promptpay.js"></script>
 <script src="assets/js/orders.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/animations.js"></script>
 <script>
+  const loggedInProfile = getProfile();
+  if (loggedInProfile) {
+    document.getElementById('customerName').value = loggedInProfile.displayName;
+  }
+
   const lines = Cart.lines();
   if (lines.length === 0) {
     document.getElementById('checkout-content').classList.add('hidden');
@@ -216,7 +223,10 @@
 
   updateTotals();
 
-  document.getElementById('checkout-form').addEventListener('submit', (e) => {
+  const errorEl = document.getElementById('checkout-error');
+  const submitBtn = document.getElementById('checkout-submit');
+
+  document.getElementById('checkout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const orderType = document.querySelector('input[name="orderType"]:checked').value;
     const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
@@ -236,8 +246,19 @@
       .join(' | ');
 
     const total = Cart.subtotal() + currentDeliveryFee();
-    const order = createOrder({ customerName, phone, orderType, note, total });
-    window.location.href = `track.html?order=${encodeURIComponent(order.order_id)}`;
+    errorEl.classList.add('hidden');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังส่งออเดอร์...';
+    try {
+      const lineUserId = loggedInProfile ? loggedInProfile.userId : '';
+      const order = await createOrder({ customerName, phone, orderType, note, total, lineUserId });
+      window.location.href = `track.html?order=${encodeURIComponent(order.order_id)}`;
+    } catch (err) {
+      errorEl.textContent = err.message || 'สั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+      errorEl.classList.remove('hidden');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ยืนยันสั่งซื้อ';
+    }
   });
 </script>
 </body>

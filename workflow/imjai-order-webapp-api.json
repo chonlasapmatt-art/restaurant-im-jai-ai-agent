@@ -1,0 +1,908 @@
+{
+  "name": "ImJai Order Web API (สั่งอาหาร + สถานะ + บัญชีของฉัน + ติดต่อเรา)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "imjai-order",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "รับออเดอร์จากเว็บ",
+      "name": "รับออเดอร์จากเว็บ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        -120
+      ],
+      "webhookId": "imjai-order-create"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════════\n//  ⚙️  แก้บรรทัดนี้ที่เดียว แล้วต่อกับ Google Sheet ได้เลย\n// ══════════════════════════════════════════════════════════════\nconst SHEET_ID = 'PASTE_YOUR_GOOGLE_SHEET_ID';   // ใช้ Sheet ID เดียวกับ workflow หลัก (น้องอิ่มใจ)\n// ══════════════════════════════════════════════════════════════\n\nconst item = $input.first();\nconst body = item.json.body || {};\n\nconst customer_name = (body.customer_name || '').toString().trim();\nconst phone = (body.phone || '').toString().trim();\nconst items = (body.items || '').toString().trim();\nconst order_type = body.order_type === 'delivery' ? 'delivery' : 'pickup';\nconst total = Number(body.total) || 0;\nconst note = (body.note || '').toString().trim();\nconst line_user_id = (body.line_user_id || '').toString().trim();\n\nconst missing = [];\nif (!customer_name) missing.push('customer_name');\nif (!phone) missing.push('phone');\nif (!items) missing.push('items');\nif (!(total > 0)) missing.push('total');\n\n// เวลาไทย (UTC+7) โดยไม่พึ่ง timezone ของเครื่อง n8n\nconst bkk = new Date(Date.now() + 7 * 3600 * 1000);\nconst pad = (n) => String(n).padStart(2, '0');\nconst ymd = `${bkk.getUTCFullYear()}${pad(bkk.getUTCMonth() + 1)}${pad(bkk.getUTCDate())}`;\nconst hms = `${pad(bkk.getUTCHours())}${pad(bkk.getUTCMinutes())}${pad(bkk.getUTCSeconds())}`;\nconst created_at = `${bkk.getUTCFullYear()}-${pad(bkk.getUTCMonth() + 1)}-${pad(bkk.getUTCDate())} ${pad(bkk.getUTCHours())}:${pad(bkk.getUTCMinutes())}:${pad(bkk.getUTCSeconds())}`;\nconst etaDate = new Date(bkk.getTime() + 20 * 60000);\nconst eta = `${pad(etaDate.getUTCHours())}:${pad(etaDate.getUTCMinutes())}`;\n\nreturn [{\n  json: {\n    valid: missing.length === 0,\n    error: missing.length ? `ข้อมูลไม่ครบ: ${missing.join(', ')}` : '',\n    sheet_id: SHEET_ID,\n    order_id: `ORD-${ymd}-${hms}`,\n    created_at,\n    line_user_id,\n    customer_name,\n    phone,\n    items,\n    total,\n    order_type,\n    status: 'รับออเดอร์แล้ว',\n    eta,\n    note,\n  }\n}];"
+      },
+      "id": "⚙️ ตั้งค่า Order API (แก้ที่นี่ที่เดียว)",
+      "name": "⚙️ ตั้งค่า Order API (แก้ที่นี่ที่เดียว)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "ข้อมูลครบไหม?",
+      "name": "ข้อมูลครบไหม?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.sheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Orders",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $json.order_id }}",
+            "created_at": "={{ $json.created_at }}",
+            "line_user_id": "={{ $json.line_user_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "phone": "={{ $json.phone }}",
+            "items": "={{ $json.items }}",
+            "total": "={{ $json.total }}",
+            "order_type": "={{ $json.order_type }}",
+            "status": "={{ $json.status }}",
+            "eta": "={{ $json.eta }}",
+            "note": "={{ $json.note }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "บันทึกออเดอร์ลงชีต Orders",
+      "name": "บันทึกออเดอร์ลงชีต Orders",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -200,
+        -220
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_GOOGLE_SHEETS_CRED",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'ok', order_id: $json.order_id, created_at: $json.created_at, eta: $json.eta } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าสำเร็จ",
+      "name": "ตอบเว็บว่าสำเร็จ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'error', message: $json.error } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าข้อมูลไม่ครบ",
+      "name": "ตอบเว็บว่าข้อมูลไม่ครบ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "imjai-order-status",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "เช็คสถานะออเดอร์จากเว็บ",
+      "name": "เช็คสถานะออเดอร์จากเว็บ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        380
+      ],
+      "webhookId": "imjai-order-status"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════════\n//  ⚙️  แก้บรรทัดนี้ที่เดียว แล้วต่อกับ Google Sheet ได้เลย\n// ══════════════════════════════════════════════════════════════\nconst SHEET_ID = 'PASTE_YOUR_GOOGLE_SHEET_ID';   // ใช้ Sheet ID เดียวกับ workflow หลัก (น้องอิ่มใจ)\n// ══════════════════════════════════════════════════════════════\n\nconst item = $input.first();\nconst order_id = (item.json.query?.order_id || '').toString().trim();\n\nreturn [{ json: { sheet_id: SHEET_ID, order_id } }];"
+      },
+      "id": "⚙️ ตั้งค่า Status API (แก้ที่นี่ที่เดียว)",
+      "name": "⚙️ ตั้งค่า Status API (แก้ที่นี่ที่เดียว)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.sheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Orders",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{ $json.order_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ค้นหาออเดอร์",
+      "name": "ค้นหาออเดอร์",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -440,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_GOOGLE_SHEETS_CRED",
+          "name": "Google Sheets account"
+        }
+      },
+      "alwaysOutputData": true,
+      "notes": "alwaysOutputData เปิดไว้ เพื่อให้ตอบ 404 ได้แม้หาไม่เจอ (ไม่งั้น flow จะเงียบไปเฉยๆ)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a",
+              "leftValue": "={{ $json.order_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "เจอออเดอร์ไหม?",
+      "name": "เจอออเดอร์ไหม?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -200,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'ok', order_id: $json.order_id, created_at: $json.created_at, items: $json.items, total: $json.total, order_type: $json.order_type, order_status: $json.status, eta: $json.eta, note: $json.note } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าเจอออเดอร์",
+      "name": "ตอบเว็บว่าเจอออเดอร์",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'not_found', message: 'ไม่พบออเดอร์นี้' } }}",
+        "options": {
+          "responseCode": 404,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าไม่เจอ",
+      "name": "ตอบเว็บว่าไม่เจอ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ ตั้งค่า 3 อย่างก่อนใช้งาน\n\n1. **SHEET_ID** — แก้ในโค้ด 2 node ⚙️ ด้านล่าง (paste Sheet ID เดียวกับ workflow หลัก \"น้องอิ่มใจ\")\n2. **Credential** — ผูก \"Google Sheets account\" ให้ node Google Sheets ทั้ง 2 ตัว (ชื่อเดียวกับ workflow หลัก n8n จะผูกอัตโนมัติถ้าตั้งชื่อ credential ตรงกัน)\n3. **Import แล้ว Save → Active** จากนั้นคัดลอก Production URL ของ webhook ทั้ง 2 ตัว มาใส่ในเว็บ (ดูขั้นตอนที่ node สีเหลืองด้านขวา)",
+        "height": 340,
+        "width": 460,
+        "color": 5
+      },
+      "id": "Sticky Note Setup",
+      "name": "Sticky Note Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔌 เอา URL ไปใส่ที่เว็บ\n\n**POST** `.../webhook/imjai-order` → วางใน `web/assets/js/orders.js`\nแทนที่ `createOrder()` ส่วนที่เขียนแค่ localStorage ด้วย `fetch(ORDER_API_URL, { method: 'POST', body: JSON.stringify(...) })`\n\n**GET** `.../webhook/imjai-order-status?order_id=...` → วางใน `web/track.html`\nแทนที่ `trackOrder()` ที่จำลองเวลา ด้วยการ `fetch()` endpoint นี้แล้วเอา `order_status`/`eta` มาแสดงแทน\n\nเสร็จแล้วเอา URL หน้าเว็บ (เช่น `.../menu.html`) ไปใส่ `ORDER_WEB_URL` ใน node ⚙️ ของ workflow หลัก\nบอทจะเริ่มส่ง QR ให้ลูกค้าทันที — ดู `web/README.md` หัวข้อ \"ทำต่อให้เป็นระบบจริง\" สำหรับโค้ดตัวอย่างแบบเต็ม",
+        "height": 340,
+        "width": 460,
+        "color": 4
+      },
+      "id": "Sticky Note Wiring",
+      "name": "Sticky Note Wiring",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "imjai-my-orders",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "ออเดอร์ของฉันจากเว็บ",
+      "name": "ออเดอร์ของฉันจากเว็บ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        780
+      ],
+      "webhookId": "imjai-my-orders"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════════\n//  ⚙️  แก้บรรทัดนี้ที่เดียว แล้วต่อกับ Google Sheet ได้เลย\n// ══════════════════════════════════════════════════════════════\nconst SHEET_ID = 'PASTE_YOUR_GOOGLE_SHEET_ID';   // ใช้ Sheet ID เดียวกับ workflow หลัก (น้องอิ่มใจ)\n// ══════════════════════════════════════════════════════════════\n\nconst item = $input.first();\nconst line_user_id = (item.json.query?.line_user_id || '').toString().trim();\n\nreturn [{ json: { sheet_id: SHEET_ID, line_user_id, valid: line_user_id.length > 0 } }];"
+      },
+      "id": "⚙️ ตั้งค่า My Orders API (แก้ที่นี่ที่เดียว)",
+      "name": "⚙️ ตั้งค่า My Orders API (แก้ที่นี่ที่เดียว)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "มี line_user_id ไหม?",
+      "name": "มี line_user_id ไหม?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.sheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Orders",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "line_user_id",
+              "lookupValue": "={{ $json.line_user_id }}"
+            }
+          ]
+        },
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "ค้นหาออเดอร์ทั้งหมดของลูกค้า",
+      "name": "ค้นหาออเดอร์ทั้งหมดของลูกค้า",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -200,
+        700
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_GOOGLE_SHEETS_CRED",
+          "name": "Google Sheets account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const orders = $input.all()\n  .map((item) => item.json)\n  .filter((o) => o.order_id)\n  .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));\n\nreturn [{ json: { result: 'ok', orders } }];"
+      },
+      "id": "เรียงออเดอร์ล่าสุดก่อน",
+      "name": "เรียงออเดอร์ล่าสุดก่อน",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บด้วยรายการออเดอร์",
+      "name": "ตอบเว็บด้วยรายการออเดอร์",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        280,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'error', message: 'ต้องส่ง line_user_id มาด้วย' } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าขาด line_user_id",
+      "name": "ตอบเว็บว่าขาด line_user_id",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "imjai-contact",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "ข้อความติดต่อเราจากเว็บ",
+      "name": "ข้อความติดต่อเราจากเว็บ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        1140
+      ],
+      "webhookId": "imjai-contact"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════════════════════════\n//  ⚙️  แก้บรรทัดนี้ที่เดียว แล้วข้อความจากฟอร์ม \"ติดต่อเรา\" จะเด้งเข้า Discord\n// ══════════════════════════════════════════════════════════════\nconst DISCORD_WEBHOOK = 'PASTE_YOUR_DISCORD_WEBHOOK_URL';   // อันเดียวกับ workflow หลักก็ได้ หรือแยกช่องก็ได้\n// ══════════════════════════════════════════════════════════════\n\nconst item = $input.first();\nconst body = item.json.body || {};\n\nconst name = (body.name || '').toString().trim();\nconst contact = (body.contact || '').toString().trim();\nconst message = (body.message || '').toString().trim();\n\nconst missing = [];\nif (!name) missing.push('name');\nif (!contact) missing.push('contact');\nif (!message) missing.push('message');\n\nreturn [{\n  json: {\n    valid: missing.length === 0,\n    error: missing.length ? `ข้อมูลไม่ครบ: ${missing.join(', ')}` : '',\n    discord_webhook: DISCORD_WEBHOOK,\n    name, contact, message,\n  }\n}];"
+      },
+      "id": "⚙️ ตั้งค่า Contact API (แก้ที่นี่ที่เดียว)",
+      "name": "⚙️ ตั้งค่า Contact API (แก้ที่นี่ที่เดียว)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        1140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "ข้อความครบไหม?",
+      "name": "ข้อความครบไหม?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        1140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.discord_webhook }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { content: `📩 **ติดต่อเราจากเว็บ**\\n**ชื่อ:** ${$json.name}\\n**ติดต่อกลับ:** ${$json.contact}\\n**ข้อความ:** ${$json.message}` } }}",
+        "options": {}
+      },
+      "id": "ส่งเข้า Discord",
+      "name": "ส่งเข้า Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -200,
+        1080
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'ok' } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าส่งข้อความสำเร็จ",
+      "name": "ตอบเว็บว่าส่งข้อความสำเร็จ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { result: 'error', message: $json.error } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ตอบเว็บว่าข้อความไม่ครบ",
+      "name": "ตอบเว็บว่าข้อความไม่ครบ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 👤 บัญชีของฉัน + ติดต่อเรา (เพิ่มใหม่)\n\n**GET** `.../webhook/imjai-my-orders?line_user_id=...` → คืนออเดอร์ทั้งหมดของ line_user_id นั้น\nใช้กับปุ่ม \"เข้าสู่ระบบด้วย LINE\" (LIFF) ในเว็บ — ต้องตั้ง LIFF_ID ใน `web/assets/js/auth.js` ด้วย\n\n**POST** `.../webhook/imjai-contact` → ส่งข้อความจากฟอร์ม \"ติดต่อเรา\" เข้า Discord\nbody: `{ name, contact, message }`\n\nเอา URL 2 อันนี้ไปใส่ `MY_ORDERS_API`/`CONTACT_API` ใน `web/assets/js/auth.js` และ `web/contact.html`",
+        "height": 280,
+        "width": 480,
+        "color": 3
+      },
+      "id": "Sticky Note Account",
+      "name": "Sticky Note Account",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        620
+      ]
+    }
+  ],
+  "connections": {
+    "รับออเดอร์จากเว็บ": {
+      "main": [
+        [
+          {
+            "node": "⚙️ ตั้งค่า Order API (แก้ที่นี่ที่เดียว)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ ตั้งค่า Order API (แก้ที่นี่ที่เดียว)": {
+      "main": [
+        [
+          {
+            "node": "ข้อมูลครบไหม?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ข้อมูลครบไหม?": {
+      "main": [
+        [
+          {
+            "node": "บันทึกออเดอร์ลงชีต Orders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ตอบเว็บว่าข้อมูลไม่ครบ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "บันทึกออเดอร์ลงชีต Orders": {
+      "main": [
+        [
+          {
+            "node": "ตอบเว็บว่าสำเร็จ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "เช็คสถานะออเดอร์จากเว็บ": {
+      "main": [
+        [
+          {
+            "node": "⚙️ ตั้งค่า Status API (แก้ที่นี่ที่เดียว)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ ตั้งค่า Status API (แก้ที่นี่ที่เดียว)": {
+      "main": [
+        [
+          {
+            "node": "ค้นหาออเดอร์",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ค้นหาออเดอร์": {
+      "main": [
+        [
+          {
+            "node": "เจอออเดอร์ไหม?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "เจอออเดอร์ไหม?": {
+      "main": [
+        [
+          {
+            "node": "ตอบเว็บว่าเจอออเดอร์",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ตอบเว็บว่าไม่เจอ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ออเดอร์ของฉันจากเว็บ": {
+      "main": [
+        [
+          {
+            "node": "⚙️ ตั้งค่า My Orders API (แก้ที่นี่ที่เดียว)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ ตั้งค่า My Orders API (แก้ที่นี่ที่เดียว)": {
+      "main": [
+        [
+          {
+            "node": "มี line_user_id ไหม?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "มี line_user_id ไหม?": {
+      "main": [
+        [
+          {
+            "node": "ค้นหาออเดอร์ทั้งหมดของลูกค้า",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ตอบเว็บว่าขาด line_user_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ค้นหาออเดอร์ทั้งหมดของลูกค้า": {
+      "main": [
+        [
+          {
+            "node": "เรียงออเดอร์ล่าสุดก่อน",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "เรียงออเดอร์ล่าสุดก่อน": {
+      "main": [
+        [
+          {
+            "node": "ตอบเว็บด้วยรายการออเดอร์",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ข้อความติดต่อเราจากเว็บ": {
+      "main": [
+        [
+          {
+            "node": "⚙️ ตั้งค่า Contact API (แก้ที่นี่ที่เดียว)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ ตั้งค่า Contact API (แก้ที่นี่ที่เดียว)": {
+      "main": [
+        [
+          {
+            "node": "ข้อความครบไหม?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ข้อความครบไหม?": {
+      "main": [
+        [
+          {
+            "node": "ส่งเข้า Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ตอบเว็บว่าข้อความไม่ครบ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ส่งเข้า Discord": {
+      "main": [
+        [
+          {
+            "node": "ตอบเว็บว่าส่งข้อความสำเร็จ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Bangkok",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "tags": [],
+  "meta": {
+    "instanceId": "imjai-order-api"
+  }
+}

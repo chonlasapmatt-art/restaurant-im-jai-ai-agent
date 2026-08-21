@@ -19,10 +19,12 @@
 <nav class="hidden md:flex gap-lg">
 <a class="text-primary font-bold" href="menu.html">เมนู</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="track.html">ติดตามออเดอร์</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="contact.html">ติดต่อเรา</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="index.html#about">เกี่ยวกับร้าน</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="index.html#location">ที่ตั้ง</a>
 </nav>
 <div class="flex items-center gap-md">
+<div data-auth-slot></div>
 <button class="relative text-primary hover:text-primary/80 transition-colors duration-200 active:scale-95 transition-transform" data-cart-toggle aria-label="ตะกร้าสินค้า">
 <span class="material-symbols-outlined">shopping_cart</span>
 <span class="hidden absolute -top-1 -right-1 bg-tertiary-container text-on-tertiary text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" data-cart-badge>0</span>
@@ -52,6 +54,9 @@
 </a>
 <a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="track.html">
 <span class="material-symbols-outlined">receipt_long</span> ติดตามออเดอร์
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="contact.html">
+<span class="material-symbols-outlined">mail</span> ติดต่อเรา
 </a>
 </nav>
 </div>
@@ -93,6 +98,7 @@
 <footer class="w-full mt-auto bg-secondary-container flex flex-col md:flex-row justify-between items-center px-lg py-xl max-w-container-max mx-auto font-label-sm text-label-sm">
 <div class="text-on-secondary-container mb-md md:mb-0">© 2026 ImJai Cafe &amp; Kitchen. Home-Cooked Professionalism.</div>
 <nav class="flex gap-md flex-wrap justify-center">
+<a class="text-on-secondary-container hover:underline" href="contact.html">ติดต่อเรา</a>
 <a class="text-on-secondary-container hover:underline" href="index.html#location">ที่ตั้ง</a>
 </nav>
 </footer>
@@ -108,6 +114,7 @@
 <script src="assets/js/products.js"></script>
 <script src="assets/js/cart.js"></script>
 <script src="assets/js/nav.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/animations.js"></script>
 <script>
   function productCardHTML(p) {
